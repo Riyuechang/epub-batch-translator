@@ -1,18 +1,21 @@
 import os
 
+from PyQt6 import QtCore
 from PyQt6.QtGui import QCursor
 from PyQt6.QtWidgets import (
     QMainWindow, 
     QApplication, 
     QVBoxLayout, 
     QHBoxLayout, 
+    QFrame,
     QWidget, 
     QTabWidget, 
     QLabel, 
     QPushButton,
     QComboBox,
     QLineEdit,
-    QPlainTextEdit
+    QPlainTextEdit,
+    QProgressBar
 )
 
 from config import config
@@ -60,6 +63,11 @@ class MainWindow(QMainWindow):
         self.button_open_folder.setText(language.front_page.open_epub_folder)
         self.select_epub_layout.addWidget(self.button_open_folder)
 
+        self.frame_line = QFrame()
+        self.frame_line.setFrameShape(QFrame.Shape.HLine)
+        self.frame_line.setFrameShadow(QFrame.Shadow.Sunken)
+        self.main_layout.addWidget(self.frame_line)
+
         self.multiple_layout = QHBoxLayout()
         self.multiple_layout.setSpacing(10)
         self.main_layout.addLayout(self.multiple_layout)
@@ -67,6 +75,8 @@ class MainWindow(QMainWindow):
         self.button_start = QPushButton()
         self.button_start.setText(language.front_page.start_processing)
         self.multiple_layout.addWidget(self.button_start, 1)
+
+        self.multiple_layout.addSpacing(20)
 
         self.label_language = QLabel()
         self.label_language.setText(language.front_page.language)
@@ -80,7 +90,7 @@ class MainWindow(QMainWindow):
         self.multiple_layout.addWidget(self.combo_box_language)
 
         self.tabs = QTabWidget()
-        self.main_layout.addWidget(self.tabs)
+        self.main_layout.addWidget(self.tabs, 1)
 
         self.tab_llm_api = QWidget()
         self.tab_vllm = QWidget()
@@ -90,7 +100,16 @@ class MainWindow(QMainWindow):
 
         self.text_edit_log = QPlainTextEdit()
         self.text_edit_log.setReadOnly(True)
-        self.main_layout.addWidget(self.text_edit_log)
+        self.main_layout.addWidget(self.text_edit_log, 1)
+
+        self.progress_bar_stage_progress = QProgressBar()
+        self.progress_bar_stage_progress.setRange(0, 100)
+        self.main_layout.addWidget(self.progress_bar_stage_progress)
+
+        self.label_stage = QLabel()
+        self.label_stage.setText(language.front_page.stage_none)
+        self.label_stage.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_layout.addWidget(self.label_stage)
 
         self.main_container = QWidget()
         self.main_container.setLayout(self.main_layout)

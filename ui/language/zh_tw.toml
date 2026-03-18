@@ -3,6 +3,7 @@ select_all_epub_flies = "全選"
 open_epub_folder = "選擇資料夾"
 start_processing = "開始"
 language = "語言"
+stage_none = "沒有正在進行的任務"
 
 [llm_api]
 tab_name = "語言模型 API"

@@ -9,12 +9,14 @@ class FrontPage:
         select_all_epub_flies:str,
         open_epub_folder:str,
         start_processing:str,
-        language: str
+        language: str,
+        stage_none: str
     ):
         self.select_all_epub_flies = select_all_epub_flies
         self.open_epub_folder = open_epub_folder
         self.start_processing = start_processing
         self.language = language
+        self.stage_none = stage_none
 
 class Api:
     def __init__(
