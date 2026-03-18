@@ -1,0 +1,8 @@
+[front_page]
+language = "語言"
+
+[llm_api]
+tab_name = "語言模型 API"
+
+[vllm]
+tab_name = "vLLM"
