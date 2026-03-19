@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
 
 from config import config
 from ui.content import language
+from utils import qt_tools
 
 
 class MainWindow(QMainWindow):
@@ -44,6 +45,8 @@ class MainWindow(QMainWindow):
         self.move(window_geometry.topLeft())
 
     def set_ui(self):
+        self.widgets_set_language_func = []
+
         self.setFocus()
 
         self.main_layout = QVBoxLayout()
@@ -56,12 +59,17 @@ class MainWindow(QMainWindow):
         self.main_layout.addLayout(self.select_epub_layout)
 
         self.combo_box_epub = QComboBox()
-        self.combo_box_epub.addItem(language.front_page.select_all_epub_flies)
+        self.combo_box_epub.addItem("none")
         self.select_epub_layout.addWidget(self.combo_box_epub, 1)
+        self.widgets_set_language_func.append(
+            lambda: self.combo_box_epub.setItemText(0, language.front_page.select_all_epub_flies)
+        )
 
         self.button_open_folder = QPushButton()
-        self.button_open_folder.setText(language.front_page.open_epub_folder)
         self.select_epub_layout.addWidget(self.button_open_folder)
+        self.widgets_set_language_func.append(
+            lambda: self.button_open_folder.setText(language.front_page.open_epub_folder)
+        )
 
         self.frame_line = QFrame()
         self.frame_line.setFrameShape(QFrame.Shape.HLine)
@@ -73,20 +81,30 @@ class MainWindow(QMainWindow):
         self.main_layout.addLayout(self.multiple_layout)
 
         self.button_start = QPushButton()
-        self.button_start.setText(language.front_page.start_processing)
         self.multiple_layout.addWidget(self.button_start, 1)
+        self.widgets_set_language_func.append(
+            lambda: self.button_start.setText(language.front_page.start_processing)
+        )
 
         self.multiple_layout.addSpacing(20)
 
         self.label_language = QLabel()
-        self.label_language.setText(language.front_page.language)
         self.multiple_layout.addWidget(self.label_language)
+        self.widgets_set_language_func.append(
+            lambda: self.label_language.setText(language.front_page.language)
+        )
 
         language_files = [dir.strip(".toml") for dir in os.listdir("./ui/language") if dir.endswith(".toml")]
 
         self.combo_box_language = QComboBox()
         self.combo_box_language.addItems(language_files)
         self.combo_box_language.setCurrentText(config.ui.language)
+        self.combo_box_language.currentTextChanged.connect(
+            lambda text: qt_tools.reset_language(
+                self.widgets_set_language_func,
+                text
+            )
+        )
         self.multiple_layout.addWidget(self.combo_box_language)
 
         self.tabs = QTabWidget()
@@ -95,8 +113,15 @@ class MainWindow(QMainWindow):
         self.tab_llm_api = QWidget()
         self.tab_vllm = QWidget()
 
-        self.tabs.addTab(self.tab_llm_api, language.llm_api.tab_name)
-        self.tabs.addTab(self.tab_vllm, language.vllm.tab_name)
+        self.tabs.addTab(self.tab_llm_api, "none")
+        self.tabs.addTab(self.tab_vllm, "none")
+
+        self.widgets_set_language_func.append(
+            lambda: self.tabs.setTabText(0, language.llm_api.tab_name)
+        )
+        self.widgets_set_language_func.append(
+            lambda: self.tabs.setTabText(1, language.vllm.tab_name)
+        )
 
         self.text_edit_log = QPlainTextEdit()
         self.text_edit_log.setReadOnly(True)
@@ -107,10 +132,14 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.progress_bar_stage_progress)
 
         self.label_stage = QLabel()
-        self.label_stage.setText(language.front_page.stage_none)
         self.label_stage.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.label_stage)
+        self.widgets_set_language_func.append(
+            lambda: self.label_stage.setText(language.front_page.stage_none)
+        )
 
         self.main_container = QWidget()
         self.main_container.setLayout(self.main_layout)
         self.setCentralWidget(self.main_container)
+
+        qt_tools.set_language(self.widgets_set_language_func)

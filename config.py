@@ -13,17 +13,21 @@ class UiConfig:
         self.language = language
 
 class Config:
-    def __init__(self, config_path: str):
+    def __init__(self):
+        pass
+
+    def load_config(self, config_path: str):
         with open(config_path, "rb") as file:
             config_data: dict[str, dict[str, str]] = tomllib.load(file)
         
-        self.load_config(**config_data)
+        self.set_config(**config_data)
 
-    def load_config(
+    def set_config(
         self,
         ui: dict[str, str]
     ):
         self.ui = UiConfig(**ui)
 
 
-config = Config("config.toml")
+config = Config()
+config.load_config("config.toml")

@@ -1,0 +1,12 @@
+[front_page]
+select_all_epub_flies = "ALL epub"
+open_epub_folder = "open folder"
+start_processing = "start processing"
+language = "language"
+stage_none = "There are no ongoing tasks."
+
+[llm_api]
+tab_name = "LLM API"
+
+[vllm]
+tab_name = "vLLM"

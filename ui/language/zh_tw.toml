@@ -1,7 +1,7 @@
 [front_page]
-select_all_epub_flies = "全選"
+select_all_epub_flies = "所有 epub"
 open_epub_folder = "選擇資料夾"
-start_processing = "開始"
+start_processing = "開始處理"
 language = "語言"
 stage_none = "沒有正在進行的任務"
 

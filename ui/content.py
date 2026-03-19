@@ -33,13 +33,16 @@ class Vllm:
         self.tab_name = tab_name
 
 class Language:
-    def __init__(self, language_path: str):
-        with open(language_path, "rb") as file:
+    def __init__(self):
+        pass
+
+    def load_language(self, ui_language: str):
+        with open(f"./ui/language/{ui_language}.toml", "rb") as file:
             language_data: dict[str, dict[str, str]] = tomllib.load(file)
 
-        self.load_language(**language_data)
+        self.set_language(**language_data)
 
-    def load_language(
+    def set_language(
         self,
         front_page: dict[str, str],
         llm_api: dict[str, str],
@@ -50,4 +53,5 @@ class Language:
         self.vllm = Vllm(**vllm)
 
 
-language = Language(f"./ui/language/{config.ui.language}.toml")
+language = Language()
+language.load_language(config.ui.language)
