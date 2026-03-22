@@ -1,43 +1,37 @@
 import tomllib
+from pathlib import Path
+from dataclasses import dataclass, field
 
 from config import config
 
 
+LANGUAGE_PATH = Path("./ui/language")
+
+
+@dataclass
 class FrontPage:
-    def __init__(
-        self,
-        select_all_epub_flies:str,
-        open_epub_folder:str,
-        start_processing:str,
-        language: str,
-        stage_none: str
-    ):
-        self.select_all_epub_flies = select_all_epub_flies
-        self.open_epub_folder = open_epub_folder
-        self.start_processing = start_processing
-        self.language = language
-        self.stage_none = stage_none
+    select_all_epub_flies:str
+    open_epub_folder:str
+    start_processing:str
+    language: str
+    stage_none: str
 
+@dataclass
 class Api:
-    def __init__(
-        self,
-        tab_name: str
-    ):
-        self.tab_name = tab_name
+    tab_name: str
 
+@dataclass
 class Vllm:
-    def __init__(
-        self,
-        tab_name: str
-    ):
-        self.tab_name = tab_name
+    tab_name: str
 
+@dataclass
 class Language:
-    def __init__(self):
-        pass
+    front_page: FrontPage = field(init=False)
+    llm_api: Api = field(init=False)
+    vllm: Vllm = field(init=False)
 
     def load_language(self, ui_language: str):
-        with open(f"./ui/language/{ui_language}.toml", "rb") as file:
+        with LANGUAGE_PATH.joinpath(f"{ui_language}.toml").open("rb") as file:
             language_data: dict[str, dict[str, str]] = tomllib.load(file)
 
         self.set_language(**language_data)
