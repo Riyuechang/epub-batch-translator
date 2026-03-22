@@ -100,9 +100,9 @@ class MainWindow(QMainWindow):
         self.combo_box_language.addItems(language_files)
         self.combo_box_language.setCurrentText(config.ui.language)
         self.combo_box_language.currentTextChanged.connect(
-            lambda text: qt_tools.reset_language(
+            lambda ui_language: qt_tools.set_language(
                 self.widgets_set_language_func,
-                text
+                ui_language
             )
         )
         self.multiple_layout.addWidget(self.combo_box_language)
