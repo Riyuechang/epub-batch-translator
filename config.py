@@ -1,9 +1,9 @@
 import json
 import tomllib
 from pathlib import Path
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
 
-from utils.tools import value_pre_init, set_dataclass_value
+from utils.tools import dataclass_pre_init, set_dataclass_value
 
 
 PRESET_CONFIG_PATH = Path("./config.toml")
@@ -12,15 +12,13 @@ USER_DATA_PATH = Path("./user_data")
 USER_CONFIG_PATH = USER_DATA_PATH.joinpath("config.json")
 
 
-@dataclass
-@value_pre_init
+@dataclass_pre_init
 class UiConfig:
     width: int
     height: int
     language: str
 
-@dataclass
-@value_pre_init
+@dataclass_pre_init
 class Config:
     ui: UiConfig
 
