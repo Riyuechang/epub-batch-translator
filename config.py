@@ -1,7 +1,9 @@
 import json
 import tomllib
 from pathlib import Path
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
+
+from utils.tools import set_dataclass_value
 
 
 PRESET_CONFIG_PATH = Path("./config.toml")
@@ -12,13 +14,16 @@ USER_CONFIG_PATH = USER_DATA_PATH.joinpath("config.json")
 
 @dataclass
 class UiConfig:
-    width: int
-    height: int
-    language: str
+    width: int = int
+    height: int = int
+    language: str = str
 
 @dataclass
 class Config:
-    ui: UiConfig = field(init=False)
+    ui: UiConfig = UiConfig
+
+    def __post_init__(self):
+        self.load_config()
 
     def load_config(self):
         if USER_CONFIG_PATH.is_file():
@@ -28,13 +33,7 @@ class Config:
             with PRESET_CONFIG_PATH.open("rb") as file:
                 config_data: dict[str, dict[str, str]] = tomllib.load(file)
 
-        self.set_config(**config_data)
-
-    def set_config(
-        self,
-        ui: dict[str, str]
-    ):
-        self.ui = UiConfig(**ui)
+        set_dataclass_value(self, config_data)
 
     def save_user_config(self):
         new_config = asdict(self)
@@ -46,4 +45,3 @@ class Config:
 
 
 config = Config()
-config.load_config()
