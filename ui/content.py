@@ -3,33 +3,37 @@ from pathlib import Path
 from dataclasses import dataclass
 
 from config import config
-from utils.tools import set_dataclass_value
+from utils.tools import value_pre_init, set_dataclass_value
 
 
 LANGUAGE_PATH = Path("./ui/language")
 
 
 @dataclass
+@value_pre_init
 class FrontPage:
-    select_all_epub_flies: str = str
-    open_epub_folder: str = str
-    start_processing: str = str
-    language: str = str
-    stage_none: str = str
+    select_all_epub_flies: str
+    open_epub_folder: str
+    start_processing: str
+    language: str
+    stage_none: str
 
 @dataclass
+@value_pre_init
 class Api:
-    tab_name: str = str
+    tab_name: str
 
 @dataclass
+@value_pre_init
 class Vllm:
-    tab_name: str = str
+    tab_name: str
 
 @dataclass
+@value_pre_init
 class Language:
-    front_page: FrontPage = FrontPage
-    llm_api: Api = Api
-    vllm: Vllm = Vllm
+    front_page: FrontPage
+    llm_api: Api
+    vllm: Vllm
 
     def __post_init__(self):
         self.load_language(config.ui.language)
