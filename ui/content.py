@@ -11,9 +11,9 @@ LANGUAGE_PATH = Path("./ui/language")
 
 @dataclass
 class FrontPage:
-    select_all_epub_flies:str = str
-    open_epub_folder:str = str
-    start_processing:str = str
+    select_all_epub_flies: str = str
+    open_epub_folder: str = str
+    start_processing: str = str
     language: str = str
     stage_none: str = str
 
