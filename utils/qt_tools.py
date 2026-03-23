@@ -1,5 +1,6 @@
 from collections.abc import Callable
 
+from config import config
 from ui.content import language
 
 
@@ -9,6 +10,8 @@ def set_language(
 ):
     if ui_language:
         language.load_language(ui_language)
+        config.ui.language = ui_language
+        config.save_user_config()
 
     for set_language_func in widgets_set_language_func:
         set_language_func()
