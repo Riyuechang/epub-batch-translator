@@ -3,7 +3,7 @@ import tomllib
 from pathlib import Path
 from dataclasses import asdict
 
-from utils.tools import dataclass_pre_init, set_dataclass_value
+from utils.dataclass_tools import dataclass_pre_init, set_dataclass_value
 
 
 PRESET_CONFIG_PATH = Path("./config.toml")

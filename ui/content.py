@@ -2,7 +2,7 @@ import tomllib
 from pathlib import Path
 
 from config import config
-from utils.tools import dataclass_pre_init, set_dataclass_value
+from utils.dataclass_tools import dataclass_pre_init, set_dataclass_value
 
 
 LANGUAGE_PATH = Path("./ui/language")
