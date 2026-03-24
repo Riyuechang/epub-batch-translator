@@ -6,7 +6,7 @@ from dataclasses import asdict
 from utils.dataclass_tools import dataclass_pre_init, set_dataclass_value
 
 
-PRESET_CONFIG_PATH = Path("./config.toml")
+DEFAULT_CONFIG_PATH = Path("./default_config.toml")
 
 USER_DATA_PATH = Path("./user_data")
 USER_CONFIG_PATH = USER_DATA_PATH.joinpath("config.json")
@@ -30,7 +30,7 @@ class Config:
             with USER_CONFIG_PATH.open("r", encoding="utf-8") as file:
                 config_data: dict[str, dict[str, str]] = json.load(file)
         else:
-            with PRESET_CONFIG_PATH.open("rb") as file:
+            with DEFAULT_CONFIG_PATH.open("rb") as file:
                 config_data: dict[str, dict[str, str]] = tomllib.load(file)
 
         set_dataclass_value(self, config_data)
