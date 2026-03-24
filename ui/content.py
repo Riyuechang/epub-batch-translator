@@ -12,9 +12,19 @@ LANGUAGE_PATH = Path("./ui/language")
 class FrontPage:
     select_all_epub_flies: str
     open_epub_folder: str
-    start_processing: str
     language: str
     stage_none: str
+    auto_processing: str
+    extract_content: str
+    calculate_similarity: str
+    content_chunking: str
+    translate: str
+    alignment_check: str
+    replace_translation: str
+
+@dataclass_pre_init
+class Prompt:
+    tab_name: str
 
 @dataclass_pre_init
 class Api:
@@ -27,6 +37,7 @@ class Vllm:
 @dataclass_pre_init
 class Language:
     front_page: FrontPage
+    prompt: Prompt
     llm_api: Api
     vllm: Vllm
 

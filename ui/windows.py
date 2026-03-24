@@ -52,90 +52,135 @@ class MainWindow(QMainWindow):
         self.main_layout = QVBoxLayout()
         self.main_layout.setContentsMargins(10, 10, 10, 10)
 
-        self.line_edit_epub_path = QLineEdit()
-        self.main_layout.addWidget(self.line_edit_epub_path)
-
-        self.select_epub_layout = QHBoxLayout()
-        self.main_layout.addLayout(self.select_epub_layout)
-
-        self.combo_box_epub = QComboBox()
-        self.combo_box_epub.addItem("none")
-        self.select_epub_layout.addWidget(self.combo_box_epub, 1)
-        self.widgets_set_language_func.append(
-            lambda: self.combo_box_epub.setItemText(0, language.front_page.select_all_epub_flies)
-        )
-
-        self.button_open_folder = QPushButton()
-        self.select_epub_layout.addWidget(self.button_open_folder)
-        self.widgets_set_language_func.append(
-            lambda: self.button_open_folder.setText(language.front_page.open_epub_folder)
-        )
-
-        self.frame_line = QFrame()
-        self.frame_line.setFrameShape(QFrame.Shape.HLine)
-        self.frame_line.setFrameShadow(QFrame.Shadow.Sunken)
-        self.main_layout.addWidget(self.frame_line)
+        self.epub_path_line_edit = QLineEdit()
+        self.main_layout.addWidget(self.epub_path_line_edit)
 
         self.multiple_layout = QHBoxLayout()
-        self.multiple_layout.setSpacing(10)
         self.main_layout.addLayout(self.multiple_layout)
 
-        self.button_start = QPushButton()
-        self.multiple_layout.addWidget(self.button_start, 1)
+        self.open_folder_button = QPushButton()
+        self.multiple_layout.addWidget(self.open_folder_button)
         self.widgets_set_language_func.append(
-            lambda: self.button_start.setText(language.front_page.start_processing)
+            lambda: self.open_folder_button.setText(language.front_page.open_epub_folder)
+        )
+
+        self.epub_combo_box = QComboBox()
+        self.epub_combo_box.addItem("none")
+        self.multiple_layout.addWidget(self.epub_combo_box, 1)
+        self.widgets_set_language_func.append(
+            lambda: self.epub_combo_box.setItemText(0, language.front_page.select_all_epub_flies)
         )
 
         self.multiple_layout.addSpacing(20)
 
-        self.label_language = QLabel()
-        self.multiple_layout.addWidget(self.label_language)
+        self.language_label = QLabel()
+        self.multiple_layout.addWidget(self.language_label)
         self.widgets_set_language_func.append(
-            lambda: self.label_language.setText(language.front_page.language)
+            lambda: self.language_label.setText(language.front_page.language)
         )
 
         language_files = [dir.strip(".toml") for dir in os.listdir("./ui/language") if dir.endswith(".toml")]
 
-        self.combo_box_language = QComboBox()
-        self.combo_box_language.addItems(language_files)
-        self.combo_box_language.setCurrentText(config.ui.language)
-        self.combo_box_language.currentTextChanged.connect(
+        self.language_combo_box = QComboBox()
+        self.language_combo_box.addItems(language_files)
+        self.language_combo_box.setCurrentText(config.ui.language)
+        self.language_combo_box.currentTextChanged.connect(
             lambda ui_language: qt_tools.set_language(
                 self.widgets_set_language_func,
                 ui_language
             )
         )
-        self.multiple_layout.addWidget(self.combo_box_language)
+        self.multiple_layout.addWidget(self.language_combo_box)
+
+        self.line_frame = QFrame()
+        self.line_frame.setFrameShape(QFrame.Shape.HLine)
+        self.line_frame.setFrameShadow(QFrame.Shadow.Sunken)
+        self.main_layout.addWidget(self.line_frame)
 
         self.tabs = QTabWidget()
-        self.main_layout.addWidget(self.tabs, 1)
+        self.main_layout.addWidget(self.tabs, 3)
 
-        self.tab_llm_api = QWidget()
-        self.tab_vllm = QWidget()
+        self.prompt_tab = QWidget()
+        self.llm_api_tab = QWidget()
+        self.vllm_tab = QWidget()
 
-        self.tabs.addTab(self.tab_llm_api, "none")
-        self.tabs.addTab(self.tab_vllm, "none")
+        self.tabs.addTab(self.prompt_tab, "none")
+        self.tabs.addTab(self.llm_api_tab, "none")
+        self.tabs.addTab(self.vllm_tab, "none")
 
         self.widgets_set_language_func.append(
-            lambda: self.tabs.setTabText(0, language.llm_api.tab_name)
+            lambda: self.tabs.setTabText(0, language.prompt.tab_name)
         )
         self.widgets_set_language_func.append(
-            lambda: self.tabs.setTabText(1, language.vllm.tab_name)
+            lambda: self.tabs.setTabText(1, language.llm_api.tab_name)
+        )
+        self.widgets_set_language_func.append(
+            lambda: self.tabs.setTabText(2, language.vllm.tab_name)
         )
 
-        self.text_edit_log = QPlainTextEdit()
-        self.text_edit_log.setReadOnly(True)
-        self.main_layout.addWidget(self.text_edit_log, 1)
+        self.log_text_edit = QPlainTextEdit()
+        self.log_text_edit.setReadOnly(True)
+        self.main_layout.addWidget(self.log_text_edit, 1)
 
-        self.progress_bar_stage_progress = QProgressBar()
-        self.progress_bar_stage_progress.setRange(0, 100)
-        self.main_layout.addWidget(self.progress_bar_stage_progress)
+        self.stage_progress_bar = QProgressBar()
+        self.stage_progress_bar.setRange(0, 100)
+        self.main_layout.addWidget(self.stage_progress_bar)
 
-        self.label_stage = QLabel()
-        self.label_stage.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.main_layout.addWidget(self.label_stage)
+        self.stage_label = QLabel()
+        self.stage_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_layout.addWidget(self.stage_label)
         self.widgets_set_language_func.append(
-            lambda: self.label_stage.setText(language.front_page.stage_none)
+            lambda: self.stage_label.setText(language.front_page.stage_none)
+        )
+
+        self.line2_frame = QFrame()
+        self.line2_frame.setFrameShape(QFrame.Shape.HLine)
+        self.line2_frame.setFrameShadow(QFrame.Shadow.Sunken)
+        self.main_layout.addWidget(self.line2_frame)
+
+        self.processing_layout = QHBoxLayout()
+        self.main_layout.addLayout(self.processing_layout)
+
+        self.extract_content_button = QPushButton()
+        self.processing_layout.addWidget(self.extract_content_button)
+        self.widgets_set_language_func.append(
+            lambda: self.extract_content_button.setText(language.front_page.extract_content)
+        )
+
+        self.calculate_similarity_button = QPushButton()
+        self.processing_layout.addWidget(self.calculate_similarity_button)
+        self.widgets_set_language_func.append(
+            lambda: self.calculate_similarity_button.setText(language.front_page.calculate_similarity)
+        )
+
+        self.content_chunking_button = QPushButton()
+        self.processing_layout.addWidget(self.content_chunking_button)
+        self.widgets_set_language_func.append(
+            lambda: self.content_chunking_button.setText(language.front_page.content_chunking)
+        )
+
+        self.translate_button = QPushButton()
+        self.processing_layout.addWidget(self.translate_button)
+        self.widgets_set_language_func.append(
+            lambda: self.translate_button.setText(language.front_page.translate)
+        )
+
+        self.alignment_check_button = QPushButton()
+        self.processing_layout.addWidget(self.alignment_check_button)
+        self.widgets_set_language_func.append(
+            lambda: self.alignment_check_button.setText(language.front_page.alignment_check)
+        )
+
+        self.replace_translation_button = QPushButton()
+        self.processing_layout.addWidget(self.replace_translation_button)
+        self.widgets_set_language_func.append(
+            lambda: self.replace_translation_button.setText(language.front_page.replace_translation)
+        )
+
+        self.auto_processing_button = QPushButton()
+        self.main_layout.addWidget(self.auto_processing_button)
+        self.widgets_set_language_func.append(
+            lambda: self.auto_processing_button.setText(language.front_page.auto_processing)
         )
 
         self.main_container = QWidget()
