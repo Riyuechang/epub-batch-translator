@@ -1,7 +1,7 @@
 import os
 
 from PyQt6 import QtCore
-from PyQt6.QtGui import QCursor
+from PyQt6.QtGui import QCursor, QActionGroup, QAction
 from PyQt6.QtWidgets import (
     QMainWindow, 
     QApplication, 
@@ -49,6 +49,31 @@ class MainWindow(QMainWindow):
 
         self.setFocus()
 
+        self.menu_bar = self.menuBar()
+
+        self.language_menu = self.menu_bar.addMenu(language.main_page.language)
+        self.widgets_set_language_func.append(
+            lambda: self.language_menu.setTitle(language.main_page.language)
+        )
+
+        self.language_group = QActionGroup(self)
+
+        self.language_actions: dict[str, QAction] = {dir.strip(".toml"): "" for dir in os.listdir("./ui/language") if dir.endswith(".toml")}
+        for language_name in self.language_actions:
+            action = QAction(language_name)
+            action.setCheckable(True)
+            self.language_group.addAction(action)
+            self.language_menu.addAction(action)
+            self.language_actions[language_name] = action
+
+        self.language_actions[config.ui.language].setChecked(True)
+        self.language_group.triggered.connect(
+            lambda ui_language: qt_tools.set_language(
+                self.widgets_set_language_func,
+                ui_language.text()
+            )
+        )
+
         self.main_layout = QVBoxLayout()
         self.main_layout.setContentsMargins(10, 10, 10, 10)
 
@@ -71,27 +96,6 @@ class MainWindow(QMainWindow):
         self.widgets_set_language_func.append(
             lambda: self.epub_combo_box.setItemText(0, language.main_page.select_all_epub_flies)
         )
-
-        self.multiple_layout.addSpacing(20)
-
-        self.language_label = QLabel()
-        self.multiple_layout.addWidget(self.language_label)
-        self.widgets_set_language_func.append(
-            lambda: self.language_label.setText(language.main_page.language)
-        )
-
-        language_files = [dir.strip(".toml") for dir in os.listdir("./ui/language") if dir.endswith(".toml")]
-
-        self.language_combo_box = QComboBox()
-        self.language_combo_box.addItems(language_files)
-        self.language_combo_box.setCurrentText(config.ui.language)
-        self.language_combo_box.currentTextChanged.connect(
-            lambda ui_language: qt_tools.set_language(
-                self.widgets_set_language_func,
-                ui_language
-            )
-        )
-        self.multiple_layout.addWidget(self.language_combo_box)
 
         self.line_frame = QFrame()
         self.line_frame.setFrameShape(QFrame.Shape.HLine)

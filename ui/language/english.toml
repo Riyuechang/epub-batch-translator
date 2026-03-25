@@ -1,12 +1,23 @@
-[front_page]
+[main_page]
 select_all_epub_flies = "ALL epub"
 open_epub_folder = "open folder"
-start_processing = "start processing"
 language = "language"
-stage_none = "There are no ongoing tasks."
 
-[llm_api]
+[processing_stage]
+no_task = "There are no ongoing tasks."
+auto_processing = "auto"
+extract_content = "extract content"
+calculate_similarity = "calculate similarity"
+content_chunking = "content chunking"
+translate = "translate"
+alignment_check = "alignment check"
+replace_translation = "replace translation"
+
+[prompt_tab]
+tab_name = "prompt"
+
+[llm_api_tab]
 tab_name = "LLM API"
 
-[vllm]
+[vllm_tab]
 tab_name = "vLLM"
