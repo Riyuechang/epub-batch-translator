@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import (
     QApplication, 
     QVBoxLayout, 
     QHBoxLayout, 
-    QFrame,
     QWidget, 
     QTabWidget, 
     QLabel, 
@@ -20,7 +19,7 @@ from PyQt6.QtWidgets import (
 
 from config import config
 from ui.content import language
-from utils import qt_tools
+from utils.qt_tools import set_language, set_frame
 
 
 class MainWindow(QMainWindow):
@@ -48,7 +47,12 @@ class MainWindow(QMainWindow):
         self.widgets_set_language_func = []
 
         self.setFocus()
+        self.set_menu()
+        self.set_main_layout()
 
+        set_language(self.widgets_set_language_func)
+    
+    def set_menu(self):
         self.menu_bar = self.menuBar()
 
         self.language_menu = self.menu_bar.addMenu(language.main_page.language)
@@ -57,6 +61,12 @@ class MainWindow(QMainWindow):
         )
 
         self.language_group = QActionGroup(self)
+        self.language_group.triggered.connect(
+            lambda ui_language: set_language(
+                self.widgets_set_language_func,
+                ui_language.text()
+            )
+        )
 
         self.language_actions: dict[str, QAction] = {dir.strip(".toml"): "" for dir in os.listdir("./ui/language") if dir.endswith(".toml")}
         for language_name in self.language_actions:
@@ -67,20 +77,53 @@ class MainWindow(QMainWindow):
             self.language_actions[language_name] = action
 
         self.language_actions[config.ui.language].setChecked(True)
-        self.language_group.triggered.connect(
-            lambda ui_language: qt_tools.set_language(
-                self.widgets_set_language_func,
-                ui_language.text()
-            )
-        )
 
+    def set_main_layout(self):
         self.main_layout = QVBoxLayout()
         self.main_layout.setContentsMargins(10, 10, 10, 10)
+
+        self.main_container = QWidget()
+        self.main_container.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_container)
 
         self.epub_path_line_edit = QLineEdit()
         self.epub_path_line_edit.setText(config.epub_folder_path)
         self.main_layout.addWidget(self.epub_path_line_edit)
 
+        self.set_multiple_layout()
+
+        self.line_frame = set_frame()
+        self.main_layout.addWidget(self.line_frame)
+
+        self.set_tabs()
+
+        self.log_text_edit = QPlainTextEdit()
+        self.log_text_edit.setReadOnly(True)
+        self.main_layout.addWidget(self.log_text_edit, 1)
+
+        self.stage_progress_bar = QProgressBar()
+        self.stage_progress_bar.setRange(0, 100)
+        self.main_layout.addWidget(self.stage_progress_bar)
+
+        self.stage_label = QLabel()
+        self.stage_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.main_layout.addWidget(self.stage_label)
+        self.widgets_set_language_func.append(
+            lambda: self.stage_label.setText(language.processing_stage.no_task)
+        )
+
+        self.line2_frame = set_frame()
+        self.main_layout.addWidget(self.line2_frame)
+
+        self.set_processing_layout()
+
+        self.auto_processing_button = QPushButton()
+        self.main_layout.addWidget(self.auto_processing_button)
+        self.widgets_set_language_func.append(
+            lambda: self.auto_processing_button.setText(language.processing_stage.auto_processing)
+        )
+
+    def set_multiple_layout(self):
         self.multiple_layout = QHBoxLayout()
         self.main_layout.addLayout(self.multiple_layout)
 
@@ -97,11 +140,7 @@ class MainWindow(QMainWindow):
             lambda: self.epub_combo_box.setItemText(0, language.main_page.select_all_epub_flies)
         )
 
-        self.line_frame = QFrame()
-        self.line_frame.setFrameShape(QFrame.Shape.HLine)
-        self.line_frame.setFrameShadow(QFrame.Shadow.Sunken)
-        self.main_layout.addWidget(self.line_frame)
-
+    def set_tabs(self):
         self.tabs = QTabWidget()
         self.main_layout.addWidget(self.tabs, 3)
 
@@ -123,26 +162,7 @@ class MainWindow(QMainWindow):
             lambda: self.tabs.setTabText(2, language.vllm_tab.tab_name)
         )
 
-        self.log_text_edit = QPlainTextEdit()
-        self.log_text_edit.setReadOnly(True)
-        self.main_layout.addWidget(self.log_text_edit, 1)
-
-        self.stage_progress_bar = QProgressBar()
-        self.stage_progress_bar.setRange(0, 100)
-        self.main_layout.addWidget(self.stage_progress_bar)
-
-        self.stage_label = QLabel()
-        self.stage_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.main_layout.addWidget(self.stage_label)
-        self.widgets_set_language_func.append(
-            lambda: self.stage_label.setText(language.processing_stage.no_task)
-        )
-
-        self.line2_frame = QFrame()
-        self.line2_frame.setFrameShape(QFrame.Shape.HLine)
-        self.line2_frame.setFrameShadow(QFrame.Shadow.Sunken)
-        self.main_layout.addWidget(self.line2_frame)
-
+    def set_processing_layout(self):
         self.processing_layout = QHBoxLayout()
         self.main_layout.addLayout(self.processing_layout)
 
@@ -181,15 +201,3 @@ class MainWindow(QMainWindow):
         self.widgets_set_language_func.append(
             lambda: self.replace_translation_button.setText(language.processing_stage.replace_translation)
         )
-
-        self.auto_processing_button = QPushButton()
-        self.main_layout.addWidget(self.auto_processing_button)
-        self.widgets_set_language_func.append(
-            lambda: self.auto_processing_button.setText(language.processing_stage.auto_processing)
-        )
-
-        self.main_container = QWidget()
-        self.main_container.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_container)
-
-        qt_tools.set_language(self.widgets_set_language_func)

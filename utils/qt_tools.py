@@ -1,5 +1,7 @@
 from collections.abc import Callable
 
+from PyQt6.QtWidgets import QFrame
+
 from config import config
 from ui.content import language
 
@@ -15,3 +17,10 @@ def set_language(
 
     for set_language_func in widgets_set_language_func:
         set_language_func()
+
+def set_frame():
+    frame = QFrame()
+    frame.setFrameShape(QFrame.Shape.HLine)
+    frame.setFrameShadow(QFrame.Shadow.Sunken)
+
+    return frame
