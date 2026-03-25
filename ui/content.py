@@ -9,11 +9,14 @@ LANGUAGE_PATH = Path("./ui/language")
 
 
 @dataclass_pre_init
-class FrontPage:
+class MainPage:
     select_all_epub_flies: str
     open_epub_folder: str
     language: str
-    stage_none: str
+
+@dataclass_pre_init
+class ProcessingStage:
+    no_task: str
     auto_processing: str
     extract_content: str
     calculate_similarity: str
@@ -23,23 +26,24 @@ class FrontPage:
     replace_translation: str
 
 @dataclass_pre_init
-class Prompt:
+class PromptTab:
     tab_name: str
 
 @dataclass_pre_init
-class Api:
+class LlmApiTab:
     tab_name: str
 
 @dataclass_pre_init
-class Vllm:
+class VllmTab:
     tab_name: str
 
 @dataclass_pre_init
 class Language:
-    front_page: FrontPage
-    prompt: Prompt
-    llm_api: Api
-    vllm: Vllm
+    main_page: MainPage
+    processing_stage: ProcessingStage
+    prompt_tab: PromptTab
+    llm_api_tab: LlmApiTab
+    vllm_tab: VllmTab
 
     def __post_init__(self):
         self.load_language(config.ui.language)

@@ -20,6 +20,7 @@ class UiConfig:
 
 @dataclass_pre_init
 class Config:
+    epub_folder_path: str
     ui: UiConfig
 
     def __post_init__(self):

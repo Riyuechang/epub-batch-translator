@@ -1,8 +1,10 @@
-[front_page]
+[main_page]
 select_all_epub_flies = "所有 epub"
 open_epub_folder = "選擇資料夾"
 language = "語言"
-stage_none = "沒有正在進行的任務"
+
+[processing_stage]
+no_task = "沒有正在進行的任務"
 auto_processing = "自動處理"
 extract_content = "提取內容"
 calculate_similarity = "計算相似度"
@@ -11,11 +13,11 @@ translate = "翻譯"
 alignment_check = "對齊檢查"
 replace_translation = "替換翻譯"
 
-[prompt]
+[prompt_tab]
 tab_name = "提示詞"
 
-[llm_api]
+[llm_api_tab]
 tab_name = "語言模型 API"
 
-[vllm]
+[vllm_tab]
 tab_name = "vLLM"

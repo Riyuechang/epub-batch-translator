@@ -1,3 +1,5 @@
+epub_folder_path = ""
+
 [ui]
 width = 640
 height = 720
