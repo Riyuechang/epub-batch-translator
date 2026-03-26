@@ -19,7 +19,7 @@ from PyQt6.QtWidgets import (
 
 from config import config
 from ui.content import language
-from utils.qt_tools import set_language, set_frame, reset_ui_message
+from utils.qt_tools import set_language, set_frame, reset_ui_message, about_message
 
 
 class MainWindow(QMainWindow):
@@ -66,6 +66,7 @@ class MainWindow(QMainWindow):
 
         self.set_settings_menu()
         self.set_language_menu()
+        self.set_about_menu()
 
     def set_settings_menu(self):
         self.settings_menu = self.menu_bar.addMenu("none")
@@ -103,6 +104,13 @@ class MainWindow(QMainWindow):
             self.language_actions[language_name] = action
 
         self.language_actions[config.ui.language].setChecked(True)
+
+    def set_about_menu(self):
+        self.about_action = self.menu_bar.addAction("none")
+        self.about_action.triggered.connect(about_message)
+        self.widgets_set_language_func.append(
+            lambda: self.about_action.setText(language.menu_bar.about)
+        )
 
     def set_main_layout(self):
         self.main_layout = QVBoxLayout()

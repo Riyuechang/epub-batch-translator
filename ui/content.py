@@ -17,6 +17,7 @@ class SettingsMenu:
 class MenuBar:
     settings_menu: SettingsMenu
     language: str
+    about: str
 
 @dataclass_pre_init
 class MainPage:
@@ -54,6 +55,12 @@ class ResetUiMessage:
     cancel: str
 
 @dataclass_pre_init
+class AboutMessage:
+    title: str
+    message: str
+    confirm: str
+
+@dataclass_pre_init
 class Language:
     menu_bar: MenuBar
     main_page: MainPage
@@ -62,6 +69,7 @@ class Language:
     llm_api_tab: LlmApiTab
     vllm_tab: VllmTab
     reset_ui_message: ResetUiMessage
+    about_message: AboutMessage
 
     def __post_init__(self):
         self.load_language(config.ui.language)

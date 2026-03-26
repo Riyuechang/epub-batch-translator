@@ -1,5 +1,6 @@
 [menu_bar]
 language = "language"
+about = "about"
 
 [menu_bar.settings_menu]
 menu_name = "settings"
@@ -36,3 +37,11 @@ This will directly delete saved user settings, causing window size, language, an
 A restart of the application is required for the changes to take effect."""
 confirm = "confirm and restart"
 cancel = "cancel"
+
+[about_message]
+title = "about"
+message = """
+Version: v0.0.alpha
+<br><br>Dev: <a href="https://github.com/Riyuechang">Riyuechang</a>
+<br><br>Repo: <a href="https://github.com/Riyuechang/epub-batch-translator">epub-batch-translator</a>"""
+confirm = "confirm"

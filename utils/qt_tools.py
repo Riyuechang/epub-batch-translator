@@ -1,7 +1,7 @@
 import sys
 from collections.abc import Callable
 
-from PyQt6.QtCore import QProcess
+from PyQt6.QtCore import QProcess, Qt
 from PyQt6.QtWidgets import QApplication, QFrame, QMessageBox
 
 from config import config
@@ -50,3 +50,12 @@ def reset_ui_message():
     if clicked_button == action_button:
         remove_user_config()
         restart_app()
+
+def about_message():
+    message_box = QMessageBox()
+
+    message_box.setWindowTitle(language.about_message.title)
+    message_box.setText(language.about_message.message)
+    message_box.setTextFormat(Qt.TextFormat.RichText)
+    message_box.addButton(language.about_message.confirm, QMessageBox.ButtonRole.AcceptRole)
+    message_box.exec()

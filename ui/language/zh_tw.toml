@@ -1,5 +1,6 @@
 [menu_bar]
 language = "語言"
+about = "關於"
 
 [menu_bar.settings_menu]
 menu_name = "設定"
@@ -36,3 +37,11 @@ message = """
 需要重新啟動應用程式才會生效"""
 confirm = "確認並重啟"
 cancel = "取消"
+
+[about_message]
+title = "關於"
+message = """
+版本: v0.0.alpha
+<br><br>開發者: <a href="https://github.com/Riyuechang">Riyuechang</a>
+<br><br>儲存庫: <a href="https://github.com/Riyuechang/epub-batch-translator">epub-batch-translator</a>"""
+confirm = "確認"
