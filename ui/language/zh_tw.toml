@@ -1,7 +1,13 @@
+[menu_bar]
+language = "語言"
+
+[menu_bar.settings_menu]
+menu_name = "設定"
+reset_ui = "重置 UI"
+
 [main_page]
 select_all_epub_flies = "所有 epub"
 open_epub_folder = "選擇資料夾"
-language = "語言"
 
 [processing_stage]
 no_task = "沒有正在進行的任務"
@@ -21,3 +27,12 @@ tab_name = "語言模型 API"
 
 [vllm_tab]
 tab_name = "vLLM"
+
+[reset_ui_message]
+title = "警告！"
+message = """
+這將直接刪除已儲存的使用者設定，導致視窗大小、語言和其他設定恢復成預設值。
+
+需要重新啟動應用程式才會生效"""
+confirm = "確認並重啟"
+cancel = "取消"

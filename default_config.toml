@@ -1,6 +1,6 @@
 epub_folder_path = ""
 
 [ui]
-width = 640
+width = 960
 height = 720
 language = "zh_tw"

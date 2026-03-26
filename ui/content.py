@@ -9,10 +9,19 @@ LANGUAGE_PATH = Path("./ui/language")
 
 
 @dataclass_pre_init
+class SettingsMenu:
+    menu_name: str
+    reset_ui: str
+
+@dataclass_pre_init
+class MenuBar:
+    settings_menu: SettingsMenu
+    language: str
+
+@dataclass_pre_init
 class MainPage:
     select_all_epub_flies: str
     open_epub_folder: str
-    language: str
 
 @dataclass_pre_init
 class ProcessingStage:
@@ -38,12 +47,21 @@ class VllmTab:
     tab_name: str
 
 @dataclass_pre_init
+class ResetUiMessage:
+    title: str
+    message: str
+    confirm: str
+    cancel: str
+
+@dataclass_pre_init
 class Language:
+    menu_bar: MenuBar
     main_page: MainPage
     processing_stage: ProcessingStage
     prompt_tab: PromptTab
     llm_api_tab: LlmApiTab
     vllm_tab: VllmTab
+    reset_ui_message: ResetUiMessage
 
     def __post_init__(self):
         self.load_language(config.ui.language)

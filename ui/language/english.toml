@@ -1,7 +1,13 @@
+[menu_bar]
+language = "language"
+
+[menu_bar.settings_menu]
+menu_name = "settings"
+reset_ui = "reset ui"
+
 [main_page]
 select_all_epub_flies = "ALL epub"
 open_epub_folder = "open folder"
-language = "language"
 
 [processing_stage]
 no_task = "There are no ongoing tasks."
@@ -21,3 +27,12 @@ tab_name = "LLM API"
 
 [vllm_tab]
 tab_name = "vLLM"
+
+[reset_ui_message]
+title = "Warning!"
+message = """
+This will directly delete saved user settings, causing window size, language, and other settings to revert to default values.
+
+A restart of the application is required for the changes to take effect."""
+confirm = "confirm and restart"
+cancel = "cancel"

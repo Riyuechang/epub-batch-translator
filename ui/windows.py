@@ -19,7 +19,7 @@ from PyQt6.QtWidgets import (
 
 from config import config
 from ui.content import language
-from utils.qt_tools import set_language, set_frame
+from utils.qt_tools import set_language, set_frame, reset_ui_message
 
 
 class MainWindow(QMainWindow):
@@ -30,6 +30,15 @@ class MainWindow(QMainWindow):
         self.resize(config.ui.width, config.ui.height)
         self.center()
         self.set_ui()
+
+    def resizeEvent(self, event):
+        window_width = self.width()
+        window_height = self.height()
+
+        if window_width != config.ui.width or window_height != config.ui.height:
+            config.ui.width = window_width
+            config.ui.height = window_height
+            config.save_user_config()
 
     def center(self):
         screen = QApplication.screenAt(QCursor.pos())
@@ -55,9 +64,26 @@ class MainWindow(QMainWindow):
     def set_menu(self):
         self.menu_bar = self.menuBar()
 
-        self.language_menu = self.menu_bar.addMenu(language.main_page.language)
+        self.set_settings_menu()
+        self.set_language_menu()
+
+    def set_settings_menu(self):
+        self.settings_menu = self.menu_bar.addMenu("none")
         self.widgets_set_language_func.append(
-            lambda: self.language_menu.setTitle(language.main_page.language)
+            lambda: self.settings_menu.setTitle(language.menu_bar.settings_menu.menu_name)
+        )
+
+        self.reset_ui_action = QAction()
+        self.reset_ui_action.triggered.connect(reset_ui_message)
+        self.settings_menu.addAction(self.reset_ui_action)
+        self.widgets_set_language_func.append(
+            lambda: self.reset_ui_action.setText(language.menu_bar.settings_menu.reset_ui)
+        )
+
+    def set_language_menu(self):
+        self.language_menu = self.menu_bar.addMenu("none")
+        self.widgets_set_language_func.append(
+            lambda: self.language_menu.setTitle(language.menu_bar.language)
         )
 
         self.language_group = QActionGroup(self)
