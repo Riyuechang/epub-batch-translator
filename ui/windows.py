@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
     QLabel, 
     QPushButton,
     QComboBox,
+    QCheckBox,
     QLineEdit,
     QPlainTextEdit,
     QProgressBar
@@ -19,7 +20,15 @@ from PyQt6.QtWidgets import (
 
 from config import config
 from ui.content import language
-from utils.qt_tools import set_language, set_frame, reset_ui_message, about_message
+from utils.qt_tools import (
+    open_folder, 
+    read_epub,
+    set_subfolder,
+    set_language, 
+    set_frame, 
+    reset_ui_message, 
+    about_message
+)
 
 
 class MainWindow(QMainWindow):
@@ -121,10 +130,13 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.main_container)
 
         self.epub_path_line_edit = QLineEdit()
-        self.epub_path_line_edit.setText(config.epub_folder_path)
+        self.epub_path_line_edit.textChanged.connect(
+            lambda text: read_epub(text, self.epub_combo_box)
+        )
+        self.epub_path_line_edit.setText(config.epub.epub_folder_path)
         self.main_layout.addWidget(self.epub_path_line_edit)
 
-        self.set_multiple_layout()
+        self.set_epub_widget_layout()
 
         self.line_frame = set_frame()
         self.main_layout.addWidget(self.line_frame)
@@ -157,21 +169,34 @@ class MainWindow(QMainWindow):
             lambda: self.auto_processing_button.setText(language.processing_stage.auto_processing)
         )
 
-    def set_multiple_layout(self):
-        self.multiple_layout = QHBoxLayout()
-        self.main_layout.addLayout(self.multiple_layout)
+    def set_epub_widget_layout(self):
+        self.epub_widget_layout = QHBoxLayout()
+        self.main_layout.addLayout(self.epub_widget_layout)
 
         self.open_folder_button = QPushButton()
-        self.multiple_layout.addWidget(self.open_folder_button)
+        self.open_folder_button.clicked.connect(
+            lambda: open_folder(self.epub_path_line_edit.setText)
+        )
+        self.epub_widget_layout.addWidget(self.open_folder_button)
         self.widgets_set_language_func.append(
-            lambda: self.open_folder_button.setText(language.main_page.open_epub_folder)
+            lambda: self.open_folder_button.setText(language.epub_widget.open_epub_folder)
         )
 
         self.epub_combo_box = QComboBox()
         self.epub_combo_box.addItem("none")
-        self.multiple_layout.addWidget(self.epub_combo_box, 1)
+        self.epub_widget_layout.addWidget(self.epub_combo_box, 1)
         self.widgets_set_language_func.append(
-            lambda: self.epub_combo_box.setItemText(0, language.main_page.select_all_epub_flies)
+            lambda: self.epub_combo_box.setItemText(0, language.epub_widget.select_all_epub_flies)
+        )
+
+        self.subfolder_check_box = QCheckBox()
+        self.subfolder_check_box.setChecked(config.epub.subfolder)
+        self.subfolder_check_box.clicked.connect(
+            lambda state: set_subfolder(state, self.epub_combo_box)
+        )
+        self.epub_widget_layout.addWidget(self.subfolder_check_box)
+        self.widgets_set_language_func.append(
+            lambda: self.subfolder_check_box.setText(language.epub_widget.subfolder)
         )
 
     def set_tabs(self):

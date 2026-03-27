@@ -12,6 +12,12 @@ USER_DATA_PATH = Path("./user_data")
 USER_CONFIG_PATH = USER_DATA_PATH.joinpath("config.json")
 
 
+
+@dataclass_pre_init
+class EpubConfig:
+    epub_folder_path: str
+    subfolder: bool
+
 @dataclass_pre_init
 class UiConfig:
     width: int
@@ -20,8 +26,8 @@ class UiConfig:
 
 @dataclass_pre_init
 class Config:
-    epub_folder_path: str
     ui: UiConfig
+    epub: EpubConfig
 
     def __post_init__(self):
         self.load_config()
