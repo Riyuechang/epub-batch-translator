@@ -21,9 +21,7 @@ from PyQt6.QtWidgets import (
 from config import config
 from ui.content import language
 from utils.qt_tools import (
-    open_folder, 
-    read_epub,
-    set_subfolder,
+    Epub,
     set_language, 
     set_frame, 
     reset_ui_message, 
@@ -40,14 +38,11 @@ class MainWindow(QMainWindow):
         self.center()
         self.set_ui()
 
-    def resizeEvent(self, event):
-        window_width = self.width()
-        window_height = self.height()
+    def closeEvent(self, event):
+        config.ui.width = self.width()
+        config.ui.height = self.height()
 
-        if window_width != config.ui.width or window_height != config.ui.height:
-            config.ui.width = window_width
-            config.ui.height = window_height
-            config.save_user_config()
+        config.save_user_config()
 
     def center(self):
         screen = QApplication.screenAt(QCursor.pos())
@@ -67,8 +62,10 @@ class MainWindow(QMainWindow):
         self.setFocus()
         self.set_menu()
         self.set_main_layout()
+        self.set_connect()
 
         set_language(self.widgets_set_language_func)
+        Epub.read_epub(config.epub.epub_folder_path, self.epub_combo_box)
     
     def set_menu(self):
         self.menu_bar = self.menuBar()
@@ -84,7 +81,6 @@ class MainWindow(QMainWindow):
         )
 
         self.reset_ui_action = QAction()
-        self.reset_ui_action.triggered.connect(reset_ui_message)
         self.settings_menu.addAction(self.reset_ui_action)
         self.widgets_set_language_func.append(
             lambda: self.reset_ui_action.setText(language.menu_bar.settings_menu.reset_ui)
@@ -97,12 +93,6 @@ class MainWindow(QMainWindow):
         )
 
         self.language_group = QActionGroup(self)
-        self.language_group.triggered.connect(
-            lambda ui_language: set_language(
-                self.widgets_set_language_func,
-                ui_language.text()
-            )
-        )
 
         self.language_actions: dict[str, QAction] = {dir.strip(".toml"): "" for dir in os.listdir("./ui/language") if dir.endswith(".toml")}
         for language_name in self.language_actions:
@@ -116,7 +106,6 @@ class MainWindow(QMainWindow):
 
     def set_about_menu(self):
         self.about_action = self.menu_bar.addAction("none")
-        self.about_action.triggered.connect(about_message)
         self.widgets_set_language_func.append(
             lambda: self.about_action.setText(language.menu_bar.about)
         )
@@ -130,9 +119,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.main_container)
 
         self.epub_path_line_edit = QLineEdit()
-        self.epub_path_line_edit.textChanged.connect(
-            lambda text: read_epub(text, self.epub_combo_box)
-        )
         self.epub_path_line_edit.setText(config.epub.epub_folder_path)
         self.main_layout.addWidget(self.epub_path_line_edit)
 
@@ -174,9 +160,6 @@ class MainWindow(QMainWindow):
         self.main_layout.addLayout(self.epub_widget_layout)
 
         self.open_folder_button = QPushButton()
-        self.open_folder_button.clicked.connect(
-            lambda: open_folder(self.epub_path_line_edit.setText)
-        )
         self.epub_widget_layout.addWidget(self.open_folder_button)
         self.widgets_set_language_func.append(
             lambda: self.open_folder_button.setText(language.epub_widget.open_epub_folder)
@@ -191,9 +174,6 @@ class MainWindow(QMainWindow):
 
         self.subfolder_check_box = QCheckBox()
         self.subfolder_check_box.setChecked(config.epub.subfolder)
-        self.subfolder_check_box.clicked.connect(
-            lambda state: set_subfolder(state, self.epub_combo_box)
-        )
         self.epub_widget_layout.addWidget(self.subfolder_check_box)
         self.widgets_set_language_func.append(
             lambda: self.subfolder_check_box.setText(language.epub_widget.subfolder)
@@ -259,4 +239,23 @@ class MainWindow(QMainWindow):
         self.processing_layout.addWidget(self.replace_translation_button)
         self.widgets_set_language_func.append(
             lambda: self.replace_translation_button.setText(language.processing_stage.replace_translation)
+        )
+
+    def set_connect(self):
+        self.reset_ui_action.triggered.connect(reset_ui_message)
+        self.language_group.triggered.connect(
+            lambda ui_language: set_language(
+                self.widgets_set_language_func,
+                ui_language.text()
+            )
+        )
+        self.about_action.triggered.connect(about_message)
+        self.epub_path_line_edit.textChanged.connect(
+            lambda text: Epub.read_epub(text, self.epub_combo_box)
+        )
+        self.open_folder_button.clicked.connect(
+            lambda: Epub.open_folder(self.epub_path_line_edit.setText)
+        )
+        self.subfolder_check_box.clicked.connect(
+            lambda state: Epub.set_subfolder(state, self.epub_combo_box)
         )

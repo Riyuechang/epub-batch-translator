@@ -7,9 +7,9 @@ menu_name = "設定"
 reset_ui = "重置 UI"
 
 [epub_widget]
-select_all_epub_flies = "所有 epub"
+select_all_epub_flies = "-- 所有 epub --"
 open_epub_folder = "選擇資料夾"
-subfolder = "包含子資料夾"
+subfolder = "子資料夾"
 
 [processing_stage]
 no_task = "沒有正在進行的任務"

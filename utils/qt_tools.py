@@ -13,30 +13,41 @@ from PyQt6.QtWidgets import (
 
 from config import config
 from ui.content import language
-from utils.common_tools import remove_user_config
+from utils.common_tools import path_truncate_middle, remove_user_config
 
 
-def open_folder(set_text_func: Callable[[], None]):
-    folder_path = QFileDialog.getExistingDirectory()
-    set_text_func(folder_path)
+class Epub:
+    epub_files: list[str] = []
 
-def read_epub(text: str, combo_box: QComboBox):
-    config.epub.epub_folder_path = text
-    folder_path = Path(text)
 
-    if config.epub.subfolder:
-        epub_files = [file.name for file in folder_path.rglob("*.epub") if file.is_file()]
-    else:
-        epub_files = [file.name for file in folder_path.glob("*.epub") if file.is_file()]
+    @staticmethod
+    def open_folder(set_text_func: Callable[[], None]):
+        folder_path = QFileDialog.getExistingDirectory(directory=config.epub.epub_folder_path)
 
-    epub_files.sort()
+        if folder_path:
+            set_text_func(folder_path)
 
-    combo_box.clear()
-    combo_box.addItems([language.epub_widget.select_all_epub_flies] + epub_files)
+    @staticmethod
+    def read_epub(text: str, combo_box: QComboBox):
+        config.epub.epub_folder_path = text
+        folder_path = Path(text)
 
-def set_subfolder(state: bool, combo_box: QComboBox):
-    config.epub.subfolder = state
-    read_epub(config.epub.epub_folder_path, combo_box)
+        if config.epub.subfolder:
+            Epub.epub_files = [str(file.relative_to(folder_path)) for file in folder_path.rglob("*.epub") if file.is_file()]
+        else:
+            Epub.epub_files = [file.name for file in folder_path.glob("*.epub") if file.is_file()]
+
+        Epub.epub_files.sort()
+        new_epub_files = list(map(path_truncate_middle, Epub.epub_files))
+
+        combo_box.clear()
+        combo_box.addItems([language.epub_widget.select_all_epub_flies] + new_epub_files)
+
+    @staticmethod
+    def set_subfolder(state: bool, combo_box: QComboBox):
+        config.epub.subfolder = state
+        Epub.read_epub(config.epub.epub_folder_path, combo_box)
+
 
 def set_language(
     widgets_set_language_func: list[Callable[[], None]],
@@ -57,10 +68,6 @@ def set_frame():
 
     return frame
 
-def restart_app():
-    QApplication.quit()
-    QProcess.startDetached(sys.executable, sys.argv)
-
 def reset_ui_message():
     message_box = QMessageBox()
 
@@ -77,8 +84,9 @@ def reset_ui_message():
     clicked_button = message_box.clickedButton()
 
     if clicked_button == action_button:
+        QApplication.quit()
         remove_user_config()
-        restart_app()
+        QProcess.startDetached(sys.executable, sys.argv)
 
 def about_message():
     message_box = QMessageBox()

@@ -35,15 +35,18 @@ class Config:
     def load_config(self):
         if USER_CONFIG_PATH.is_file():
             with USER_CONFIG_PATH.open("r", encoding="utf-8") as file:
-                config_data: dict[str, dict[str, str]] = json.load(file)
+                self._initial_config: dict[str, dict[str, str]] = json.load(file)
         else:
             with DEFAULT_CONFIG_PATH.open("rb") as file:
-                config_data: dict[str, dict[str, str]] = tomllib.load(file)
+                self._initial_config: dict[str, dict[str, str]] = tomllib.load(file)
 
-        set_dataclass_value(self, config_data)
+        set_dataclass_value(self, self._initial_config)
 
     def save_user_config(self):
         new_config = asdict(self)
+
+        if new_config == self._initial_config:
+            return
 
         USER_DATA_PATH.mkdir(parents=True, exist_ok=True)
 

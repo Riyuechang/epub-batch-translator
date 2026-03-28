@@ -7,7 +7,7 @@ menu_name = "settings"
 reset_ui = "reset ui"
 
 [epub_widget]
-select_all_epub_flies = "ALL epub"
+select_all_epub_flies = "-- ALL epub --"
 open_epub_folder = "open folder"
 subfolder = "subfolder"
 
