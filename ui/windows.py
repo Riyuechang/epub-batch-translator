@@ -169,8 +169,12 @@ class MainWindow(QMainWindow):
         self.epub_combo_box = QComboBox()
         self.epub_combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         self.epub_combo_box.setEditable(True)
-        self.epub_combo_box.lineEdit().setReadOnly(True)
         self.epub_combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
+
+        self.epub_combo_box_line_edit = self.epub_combo_box.lineEdit()
+        self.epub_combo_box_line_edit.setReadOnly(True)
+        self.epub_combo_box_line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
         self.epub_combo_box.addItem("none")
         self.epub_widget_layout.addWidget(self.epub_combo_box, 1)
         self.widgets_set_language_func.append(
