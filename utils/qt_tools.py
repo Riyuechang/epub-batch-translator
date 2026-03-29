@@ -13,11 +13,10 @@ from PyQt6.QtWidgets import (
 
 from config import config
 from ui.content import language
-from utils.common_tools import path_truncate_middle, remove_user_config
+from utils.common_tools import remove_user_config
 
 
 class Epub:
-    epub_files: list[str] = []
 
 
     @staticmethod
@@ -28,25 +27,24 @@ class Epub:
             set_text_func(folder_path)
 
     @staticmethod
-    def read_epub(text: str, combo_box: QComboBox):
+    def read(text: str, combo_box: QComboBox):
         config.epub.epub_folder_path = text
         folder_path = Path(text)
 
         if config.epub.subfolder:
-            Epub.epub_files = [str(file.relative_to(folder_path)) for file in folder_path.rglob("*.epub") if file.is_file()]
+            epub_files = [str(file.relative_to(folder_path)) for file in folder_path.rglob("*.epub") if file.is_file()]
         else:
-            Epub.epub_files = [file.name for file in folder_path.glob("*.epub") if file.is_file()]
+            epub_files = [file.name for file in folder_path.glob("*.epub") if file.is_file()]
 
-        Epub.epub_files.sort()
-        new_epub_files = list(map(path_truncate_middle, Epub.epub_files))
+        epub_files.sort()
 
         combo_box.clear()
-        combo_box.addItems([language.epub_widget.select_all_epub_flies] + new_epub_files)
+        combo_box.addItems([language.epub_widget.select_all_epub_flies] + epub_files)
 
     @staticmethod
     def set_subfolder(state: bool, combo_box: QComboBox):
         config.epub.subfolder = state
-        Epub.read_epub(config.epub.epub_folder_path, combo_box)
+        Epub.read(config.epub.epub_folder_path, combo_box)
 
 
 def set_language(

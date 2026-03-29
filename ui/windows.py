@@ -1,6 +1,6 @@
 import os
 
-from PyQt6 import QtCore
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QCursor, QActionGroup, QAction
 from PyQt6.QtWidgets import (
     QMainWindow, 
@@ -15,7 +15,8 @@ from PyQt6.QtWidgets import (
     QCheckBox,
     QLineEdit,
     QPlainTextEdit,
-    QProgressBar
+    QProgressBar,
+    QSizePolicy
 )
 
 from config import config
@@ -65,7 +66,7 @@ class MainWindow(QMainWindow):
         self.set_connect()
 
         set_language(self.widgets_set_language_func)
-        Epub.read_epub(config.epub.epub_folder_path, self.epub_combo_box)
+        Epub.read(config.epub.epub_folder_path, self.epub_combo_box)
     
     def set_menu(self):
         self.menu_bar = self.menuBar()
@@ -138,7 +139,7 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.stage_progress_bar)
 
         self.stage_label = QLabel()
-        self.stage_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.stage_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.stage_label)
         self.widgets_set_language_func.append(
             lambda: self.stage_label.setText(language.processing_stage.no_task)
@@ -166,6 +167,10 @@ class MainWindow(QMainWindow):
         )
 
         self.epub_combo_box = QComboBox()
+        self.epub_combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        self.epub_combo_box.setEditable(True)
+        self.epub_combo_box.lineEdit().setReadOnly(True)
+        self.epub_combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
         self.epub_combo_box.addItem("none")
         self.epub_widget_layout.addWidget(self.epub_combo_box, 1)
         self.widgets_set_language_func.append(
@@ -251,7 +256,7 @@ class MainWindow(QMainWindow):
         )
         self.about_action.triggered.connect(about_message)
         self.epub_path_line_edit.textChanged.connect(
-            lambda text: Epub.read_epub(text, self.epub_combo_box)
+            lambda text: Epub.read(text, self.epub_combo_box)
         )
         self.open_folder_button.clicked.connect(
             lambda: Epub.open_folder(self.epub_path_line_edit.setText)
