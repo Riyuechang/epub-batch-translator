@@ -12,6 +12,17 @@ USER_DATA_PATH = Path("./user_data")
 USER_CONFIG_PATH = USER_DATA_PATH.joinpath("config.json")
 
 
+@dataclass_pre_init
+class TranslationTag:
+    content: str
+    glossary: str
+    history: str
+
+@dataclass_pre_init
+class GlossaryTag:
+    source_text: str
+    translation: str
+    annotation: str
 
 @dataclass_pre_init
 class EpubConfig:
@@ -28,6 +39,8 @@ class UiConfig:
 class Config:
     ui: UiConfig
     epub: EpubConfig
+    translation_tag: TranslationTag
+    glossary_tag: GlossaryTag
 
     def __post_init__(self):
         self.load_config()

@@ -12,6 +12,7 @@ open_epub_folder = "open folder"
 subfolder = "subfolder"
 
 [processing_stage]
+select_translator = "translator"
 no_task = "There are no ongoing tasks."
 auto_processing = "auto"
 extract_content = "extract content"
@@ -21,8 +22,33 @@ translate = "translate"
 alignment_check = "alignment check"
 replace_translation = "replace translation"
 
-[prompt_tab]
-tab_name = "prompt"
+[prompts_area]
+translation_prompt = "translation prompt"
+translation_prompt_example = """
+You are an expert Chinese novel translator, skilled at translating Chinese into English in a corresponding style without compromising the original meaning or intent.
+Please use the glossary during translation to translate specific original terms into their designated equivalents, and refer to the notes provided in the glossary.
+Please refer to the history during translation to ensure smooth coherence between the preceding and following text.
+
+# History
+{history}
+
+# Glossary
+{glossary}
+
+# Chinese Source Text
+{content}"""
+glossary_prompt = "glossary prompt"
+glossary_prompt_example = "<Source Text>{source_text} <Translation>{translation} <Annotation>{annotation}"
+
+[prompts_area.translation_tag]
+content = "Content Tag"
+glossary = "Glossary Tag"
+history = "History Tag"
+
+[prompts_area.glossary_tag]
+source_text = "Source Text Tag"
+translation = "Translation Tag"
+annotation = "Annotation Tag"
 
 [llm_api_tab]
 tab_name = "LLM API"

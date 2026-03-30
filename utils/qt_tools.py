@@ -2,13 +2,17 @@ import sys
 from pathlib import Path
 from collections.abc import Callable
 
+from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QProcess, Qt
 from PyQt6.QtWidgets import (
+    QMainWindow,
     QApplication, 
     QFileDialog, 
     QFrame, 
     QMessageBox, 
-    QComboBox
+    QComboBox,
+    QLineEdit,
+    QStyle
 )
 
 from config import config
@@ -47,6 +51,10 @@ class Epub:
         Epub.read(config.epub.epub_folder_path, combo_box)
 
 
+def copy_to_clipboard(text: str):
+    clipboard = QApplication.clipboard()
+    clipboard.setText(text)
+
 def set_language(
     widgets_set_language_func: list[Callable[[], None]],
     ui_language: str = ""
@@ -54,7 +62,6 @@ def set_language(
     if ui_language:
         language.load_language(ui_language)
         config.ui.language = ui_language
-        config.save_user_config()
 
     for set_language_func in widgets_set_language_func:
         set_language_func()
@@ -65,6 +72,24 @@ def set_frame():
     frame.setFrameShadow(QFrame.Shadow.Sunken)
 
     return frame
+
+def set_copy_line_edit(cls: QMainWindow, copy_text: str):
+    copy_line_edit = QLineEdit()
+
+    copy_line_edit.setText(copy_text)
+    copy_line_edit.setReadOnly(True)
+    copy_line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    copy_action = QAction(cls.style().standardIcon(QStyle.StandardPixmap.SP_FileIcon), "")
+    copy_action.triggered.connect(
+        lambda: copy_to_clipboard(copy_line_edit.text())
+    )
+    copy_line_edit.addAction(copy_action, QLineEdit.ActionPosition.TrailingPosition)
+
+    copy_line_edit_width = copy_line_edit.fontMetrics().horizontalAdvance(copy_line_edit.text())
+    copy_line_edit.setFixedWidth(copy_line_edit_width + 35)
+
+    return copy_line_edit, copy_action
 
 def reset_ui_message():
     message_box = QMessageBox()

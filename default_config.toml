@@ -1,8 +1,18 @@
 [ui]
-width = 960
-height = 720
+width = 1200
+height = 800
 language = "zh_tw"
 
 [epub]
 epub_folder_path = ""
 subfolder = false
+
+[translation_tag]
+content = "{content}"
+glossary = "{glossary}"
+history = "{history}"
+
+[glossary_tag]
+source_text = "{source_text}"
+translation = "{translation}"
+annotation = "{annotation}"

@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import (
     QApplication, 
     QVBoxLayout, 
     QHBoxLayout, 
+    QGridLayout,
     QWidget, 
     QTabWidget, 
     QLabel, 
@@ -25,6 +26,7 @@ from utils.qt_tools import (
     Epub,
     set_language, 
     set_frame, 
+    set_copy_line_edit,
     reset_ui_message, 
     about_message
 )
@@ -128,7 +130,7 @@ class MainWindow(QMainWindow):
         self.line_frame = set_frame()
         self.main_layout.addWidget(self.line_frame)
 
-        self.set_tabs()
+        self.set_translator_layout()
 
         self.log_text_edit = QPlainTextEdit()
         self.log_text_edit.setReadOnly(True)
@@ -149,12 +151,6 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.line2_frame)
 
         self.set_processing_layout()
-
-        self.auto_processing_button = QPushButton()
-        self.main_layout.addWidget(self.auto_processing_button)
-        self.widgets_set_language_func.append(
-            lambda: self.auto_processing_button.setText(language.processing_stage.auto_processing)
-        )
 
     def set_epub_widget_layout(self):
         self.epub_widget_layout = QHBoxLayout()
@@ -188,66 +184,194 @@ class MainWindow(QMainWindow):
             lambda: self.subfolder_check_box.setText(language.epub_widget.subfolder)
         )
 
+    def set_translator_layout(self):
+        self.translator_layout = QHBoxLayout()
+        self.main_layout.addLayout(self.translator_layout, 3)
+
+        self.set_prompt_layout()
+        self.set_tabs()
+
+    def set_prompt_layout(self):
+        self.prompt_layout = QVBoxLayout()
+        self.translator_layout.addLayout(self.prompt_layout, 1)
+
+        self.set_translation_prompt_label_layout()
+
+        self.translation_prompt_text_edit = QPlainTextEdit()
+        self.prompt_layout.addWidget(self.translation_prompt_text_edit)
+        self.widgets_set_language_func.append(
+            lambda: self.translation_prompt_text_edit.setPlaceholderText(language.prompts_area.translation_prompt_example)
+        )
+
+        self.set_glossary_prompt_label_layout()
+
+        self.glossary_prompt_line_edit = QLineEdit()
+        self.prompt_layout.addWidget(self.glossary_prompt_line_edit)
+        self.widgets_set_language_func.append(
+            lambda: self.glossary_prompt_line_edit.setPlaceholderText(language.prompts_area.glossary_prompt_example)
+        )
+
+    def set_translation_prompt_label_layout(self):
+        self.translation_prompt_label_layout = QHBoxLayout()
+        self.prompt_layout.addLayout(self.translation_prompt_label_layout)
+
+        self.translation_prompt_label = QLabel()
+        self.translation_prompt_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.translation_prompt_label_layout.addWidget(self.translation_prompt_label)
+        self.widgets_set_language_func.append(
+            lambda: self.translation_prompt_label.setText(language.prompts_area.translation_prompt)
+        )
+
+        self.translation_prompt_label_layout.addSpacing(20)
+        self.translation_prompt_label_layout.addStretch(1)
+
+        self.content_tag_label = QLabel()
+        self.translation_prompt_label_layout.addWidget(self.content_tag_label)
+        self.widgets_set_language_func.append(
+            lambda: self.content_tag_label.setText(language.prompts_area.translation_tag.content)
+        )
+
+        self.content_tag_line_edit, self.content_tag_copy_action = set_copy_line_edit(self, config.translation_tag.content)
+        self.translation_prompt_label_layout.addWidget(self.content_tag_line_edit)
+
+        self.glossary_tag_label = QLabel()
+        self.translation_prompt_label_layout.addWidget(self.glossary_tag_label)
+        self.widgets_set_language_func.append(
+            lambda: self.glossary_tag_label.setText(language.prompts_area.translation_tag.glossary)
+        )
+
+        self.glossary_tag_line_edit, self.glossary_tag_copy_action = set_copy_line_edit(self, config.translation_tag.glossary)
+        self.translation_prompt_label_layout.addWidget(self.glossary_tag_line_edit)
+
+        self.history_tag_label = QLabel()
+        self.translation_prompt_label_layout.addWidget(self.history_tag_label)
+        self.widgets_set_language_func.append(
+            lambda: self.history_tag_label.setText(language.prompts_area.translation_tag.history)
+        )
+
+        self.history_tag_line_edit, self.history_tag_copy_action = set_copy_line_edit(self, config.translation_tag.history)
+        self.translation_prompt_label_layout.addWidget(self.history_tag_line_edit)
+
+    def set_glossary_prompt_label_layout(self):
+        self.glossary_prompt_label_layout = QHBoxLayout()
+        self.prompt_layout.addLayout(self.glossary_prompt_label_layout)
+
+        self.glossary_prompt_label = QLabel()
+        self.glossary_prompt_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.glossary_prompt_label_layout.addWidget(self.glossary_prompt_label)
+        self.widgets_set_language_func.append(
+            lambda: self.glossary_prompt_label.setText(language.prompts_area.glossary_prompt)
+        )
+
+        self.glossary_prompt_label_layout.addSpacing(20)
+        self.glossary_prompt_label_layout.addStretch(1)
+
+        self.source_text_tag_label = QLabel()
+        self.glossary_prompt_label_layout.addWidget(self.source_text_tag_label)
+        self.widgets_set_language_func.append(
+            lambda: self.source_text_tag_label.setText(language.prompts_area.glossary_tag.source_text)
+        )
+
+        self.source_text_tag_line_edit, self.source_text_tag_copy_action = set_copy_line_edit(self, config.glossary_tag.source_text)
+        self.glossary_prompt_label_layout.addWidget(self.source_text_tag_line_edit)
+
+        self.translation_tag_label = QLabel()
+        self.glossary_prompt_label_layout.addWidget(self.translation_tag_label)
+        self.widgets_set_language_func.append(
+            lambda: self.translation_tag_label.setText(language.prompts_area.glossary_tag.translation)
+        )
+
+        self.translation_tag_line_edit, self.translation_tag_copy_action = set_copy_line_edit(self, config.glossary_tag.translation)
+        self.glossary_prompt_label_layout.addWidget(self.translation_tag_line_edit)
+
+        self.annotation_tag_label = QLabel()
+        self.glossary_prompt_label_layout.addWidget(self.annotation_tag_label)
+        self.widgets_set_language_func.append(
+            lambda: self.annotation_tag_label.setText(language.prompts_area.glossary_tag.annotation)
+        )
+
+        self.annotation_tag_line_edit, self.annotation_tag_copy_action = set_copy_line_edit(self, config.glossary_tag.annotation)
+        self.glossary_prompt_label_layout.addWidget(self.annotation_tag_line_edit)
+
     def set_tabs(self):
         self.tabs = QTabWidget()
-        self.main_layout.addWidget(self.tabs, 3)
+        self.translator_layout.addWidget(self.tabs)
 
-        self.prompt_tab = QWidget()
         self.llm_api_tab = QWidget()
         self.vllm_tab = QWidget()
 
-        self.tabs.addTab(self.prompt_tab, "none")
         self.tabs.addTab(self.llm_api_tab, "none")
         self.tabs.addTab(self.vllm_tab, "none")
 
         self.widgets_set_language_func.append(
-            lambda: self.tabs.setTabText(0, language.prompt_tab.tab_name)
+            lambda: self.tabs.setTabText(0, language.llm_api_tab.tab_name)
         )
         self.widgets_set_language_func.append(
-            lambda: self.tabs.setTabText(1, language.llm_api_tab.tab_name)
-        )
-        self.widgets_set_language_func.append(
-            lambda: self.tabs.setTabText(2, language.vllm_tab.tab_name)
+            lambda: self.tabs.setTabText(1, language.vllm_tab.tab_name)
         )
 
     def set_processing_layout(self):
-        self.processing_layout = QHBoxLayout()
+        self.processing_layout = QGridLayout()
         self.main_layout.addLayout(self.processing_layout)
 
         self.extract_content_button = QPushButton()
-        self.processing_layout.addWidget(self.extract_content_button)
+        self.processing_layout.addWidget(self.extract_content_button, 0, 0)
         self.widgets_set_language_func.append(
             lambda: self.extract_content_button.setText(language.processing_stage.extract_content)
         )
 
         self.calculate_similarity_button = QPushButton()
-        self.processing_layout.addWidget(self.calculate_similarity_button)
+        self.processing_layout.addWidget(self.calculate_similarity_button, 0, 1)
         self.widgets_set_language_func.append(
             lambda: self.calculate_similarity_button.setText(language.processing_stage.calculate_similarity)
         )
 
         self.content_chunking_button = QPushButton()
-        self.processing_layout.addWidget(self.content_chunking_button)
+        self.processing_layout.addWidget(self.content_chunking_button, 0, 2)
         self.widgets_set_language_func.append(
             lambda: self.content_chunking_button.setText(language.processing_stage.content_chunking)
         )
 
         self.translate_button = QPushButton()
-        self.processing_layout.addWidget(self.translate_button)
+        self.processing_layout.addWidget(self.translate_button, 0, 3)
         self.widgets_set_language_func.append(
             lambda: self.translate_button.setText(language.processing_stage.translate)
         )
 
         self.alignment_check_button = QPushButton()
-        self.processing_layout.addWidget(self.alignment_check_button)
+        self.processing_layout.addWidget(self.alignment_check_button, 0, 4)
         self.widgets_set_language_func.append(
             lambda: self.alignment_check_button.setText(language.processing_stage.alignment_check)
         )
 
         self.replace_translation_button = QPushButton()
-        self.processing_layout.addWidget(self.replace_translation_button)
+        self.processing_layout.addWidget(self.replace_translation_button, 0, 5)
         self.widgets_set_language_func.append(
             lambda: self.replace_translation_button.setText(language.processing_stage.replace_translation)
+        )
+
+        self.auto_processing_button = QPushButton()
+        self.processing_layout.addWidget(self.auto_processing_button, 1, 0, 1, 4)
+        self.widgets_set_language_func.append(
+            lambda: self.auto_processing_button.setText(language.processing_stage.auto_processing)
+        )
+
+        self.select_translator_label = QLabel()
+        self.select_translator_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.processing_layout.addWidget(self.select_translator_label, 1, 4, 1, 1)
+        self.widgets_set_language_func.append(
+            lambda: self.select_translator_label.setText(language.processing_stage.select_translator)
+        )
+
+        self.select_translator_combo_box = QComboBox()
+        self.select_translator_combo_box.addItem("none")
+        self.select_translator_combo_box.addItem("none")
+        self.processing_layout.addWidget(self.select_translator_combo_box, 1, 5, 1, 1)
+        self.widgets_set_language_func.append(
+            lambda: self.select_translator_combo_box.setItemText(0, language.llm_api_tab.tab_name)
+        )
+        self.widgets_set_language_func.append(
+            lambda: self.select_translator_combo_box.setItemText(1, language.vllm_tab.tab_name)
         )
 
     def set_connect(self):

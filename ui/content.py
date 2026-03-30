@@ -27,6 +27,7 @@ class EpubWidget:
 
 @dataclass_pre_init
 class ProcessingStage:
+    select_translator: str
     no_task: str
     auto_processing: str
     extract_content: str
@@ -37,8 +38,25 @@ class ProcessingStage:
     replace_translation: str
 
 @dataclass_pre_init
-class PromptTab:
-    tab_name: str
+class TranslationTag:
+    content: str
+    glossary: str
+    history: str
+
+@dataclass_pre_init
+class GlossaryTag:
+    source_text: str
+    translation: str
+    annotation: str
+
+@dataclass_pre_init
+class PromptsArea:
+    translation_prompt: str
+    translation_prompt_example: str
+    translation_tag: TranslationTag
+    glossary_prompt: str
+    glossary_prompt_example: str
+    glossary_tag: GlossaryTag
 
 @dataclass_pre_init
 class LlmApiTab:
@@ -66,7 +84,7 @@ class Language:
     menu_bar: MenuBar
     epub_widget: EpubWidget
     processing_stage: ProcessingStage
-    prompt_tab: PromptTab
+    prompts_area: PromptsArea
     llm_api_tab: LlmApiTab
     vllm_tab: VllmTab
     reset_ui_message: ResetUiMessage

@@ -12,6 +12,7 @@ open_epub_folder = "選擇資料夾"
 subfolder = "子資料夾"
 
 [processing_stage]
+select_translator = "翻譯器"
 no_task = "沒有正在進行的任務"
 auto_processing = "自動處理"
 extract_content = "提取內容"
@@ -21,8 +22,33 @@ translate = "翻譯"
 alignment_check = "對齊檢查"
 replace_translation = "替換翻譯"
 
-[prompt_tab]
-tab_name = "提示詞"
+[prompts_area]
+translation_prompt = "翻譯提示詞"
+translation_prompt_example = """
+你是一個英文小說翻譯專家，擅長在不破壞原文想傳達的事物下，將英文以對應的風格翻譯成繁體中文。
+請在翻譯時使用術語表，將指定的原文翻譯成對應譯文，並參考術語表提供的註解進行翻譯。
+請在翻譯時參考歷史紀錄，讓前後文可以通順銜接。
+
+# 歷史紀錄
+{history}
+
+# 術語表
+{glossary}
+
+# 英文原文
+{content}"""
+glossary_prompt = "術語表提示詞"
+glossary_prompt_example = "<原文>{source_text} <譯文>{translation} <註解>{annotation}"
+
+[prompts_area.translation_tag]
+content = "內容標籤"
+glossary = "術語表標籤"
+history = "歷史標籤"
+
+[prompts_area.glossary_tag]
+source_text = "原文標籤"
+translation = "譯文標籤"
+annotation = "註解標籤"
 
 [llm_api_tab]
 tab_name = "語言模型 API"
