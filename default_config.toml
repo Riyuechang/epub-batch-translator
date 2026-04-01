@@ -5,10 +5,12 @@ language = "zh_tw"
 
 [epub]
 folder_path = ""
+options = ""
 subfolder = false
 
 [glossary]
 folder_path = ""
+options = ""
 subfolder = false
 
 [translation_tag]

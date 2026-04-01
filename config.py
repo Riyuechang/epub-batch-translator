@@ -21,11 +21,13 @@ class UiConfig:
 @dataclass_pre_init
 class EpubConfig:
     folder_path: str
+    options: str
     subfolder: bool
 
 @dataclass_pre_init
 class GlossaryConfig:
     folder_path: str
+    options: str
     subfolder: bool
 
 @dataclass_pre_init

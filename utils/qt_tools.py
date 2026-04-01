@@ -7,7 +7,6 @@ from typing import Literal
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QProcess, Qt
 from PyQt6.QtWidgets import (
-    QMainWindow,
     QApplication, 
     QHBoxLayout,
     QFileDialog, 
@@ -24,7 +23,7 @@ from PyQt6.QtWidgets import (
 from config import config, EpubConfig, GlossaryConfig
 from ui.image import icon
 from ui.content import language
-from utils.common_tools import remove_user_config
+from utils.common_tools import remove_user_config, set_file_options
 
 class Folder:
 
@@ -57,8 +56,11 @@ class Folder:
         epub_files.sort()
 
         combo_box_first_item_text = combo_box.itemText(0)
+        combo_box_index = epub_files.index(set_config.options) if set_config.options in epub_files else -1
+
         combo_box.clear()
         combo_box.addItems([combo_box_first_item_text] + epub_files)
+        combo_box.setCurrentIndex(combo_box_index + 1)
 
     @staticmethod
     def set_subfolder(
@@ -88,7 +90,7 @@ class SetWidget:
 
 
     @staticmethod
-    def files_combo_box():
+    def files_combo_box(set_config: EpubConfig | GlossaryConfig):
         combo_box = QComboBox()
         combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         combo_box.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -96,6 +98,10 @@ class SetWidget:
         combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
         combo_box.lineEdit().setReadOnly(True)
         combo_box.addItem("none")
+
+        combo_box.currentTextChanged.connect(
+            lambda text: set_file_options(set_config, text)
+        )
 
         return combo_box
 
