@@ -157,13 +157,13 @@ class MainWindow(QMainWindow):
         self.set_processing_layout()
 
     def set_epub_widget_layout(self):
-        self.epub_widget_layout = SetWidget.select_path_widget(config.epub.folder_path, config.epub.subfolder)
-        self.main_layout.addLayout(self.epub_widget_layout.layout)
+        self.epub_folder_widget = SetWidget.select_path_widget(config.epub.folder_path, config.epub.subfolder)
+        self.main_layout.addLayout(self.epub_folder_widget.layout)
         self.widgets_set_language_func.append(
-            lambda: self.epub_widget_layout.path_label.setText(language.epub_widget.folder_path)
+            lambda: self.epub_folder_widget.path_label.setText(language.epub_widget.folder_path)
         )
         self.widgets_set_language_func.append(
-            lambda: self.epub_widget_layout.subfolder_check_box.setText(language.folder_options.subfolder)
+            lambda: self.epub_folder_widget.subfolder_check_box.setText(language.folder_options.subfolder)
         )
 
         self.epub_combo_box = SetWidget.files_combo_box()
@@ -173,13 +173,13 @@ class MainWindow(QMainWindow):
         )
 
     def set_glossary_widget_layout(self):
-        self.glossary_widget_layout = SetWidget.select_path_widget(config.glossary.folder_path, config.glossary.subfolder)
-        self.main_layout.addLayout(self.glossary_widget_layout.layout)
+        self.glossary_folder_widget = SetWidget.select_path_widget(config.glossary.folder_path, config.glossary.subfolder)
+        self.main_layout.addLayout(self.glossary_folder_widget.layout)
         self.widgets_set_language_func.append(
-            lambda: self.glossary_widget_layout.path_label.setText(language.glossary_widget.folder_path)
+            lambda: self.glossary_folder_widget.path_label.setText(language.glossary_widget.folder_path)
         )
         self.widgets_set_language_func.append(
-            lambda: self.glossary_widget_layout.subfolder_check_box.setText(language.folder_options.subfolder)
+            lambda: self.glossary_folder_widget.subfolder_check_box.setText(language.folder_options.subfolder)
         )
 
         self.glossary_combo_box = SetWidget.files_combo_box()
@@ -428,6 +428,6 @@ class MainWindow(QMainWindow):
             )
         )
         self.about_action.triggered.connect(about_message)
-        SetConnect.select_path(config.epub, self.epub_widget_layout, self.epub_combo_box, "epub")
-        SetConnect.select_path(config.glossary, self.glossary_widget_layout, self.glossary_combo_box, "json")
+        SetConnect.select_path(config.epub, self.epub_folder_widget, self.epub_combo_box, "epub")
+        SetConnect.select_path(config.glossary, self.glossary_folder_widget, self.glossary_combo_box, "json")
         self.dynamic_glossary_check_box.clicked.connect(set_dynamic_glossary_state)
