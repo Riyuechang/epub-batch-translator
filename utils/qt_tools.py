@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from collections.abc import Callable
 
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QProcess, Qt
 from PyQt6.QtWidgets import (
     QMainWindow,
@@ -10,12 +10,13 @@ from PyQt6.QtWidgets import (
     QFileDialog, 
     QFrame, 
     QMessageBox, 
+    QPushButton,
     QComboBox,
-    QLineEdit,
-    QStyle
+    QLineEdit
 )
 
 from config import config
+from ui.image import icon
 from ui.content import language
 from utils.common_tools import remove_user_config
 
@@ -80,7 +81,7 @@ def set_copy_line_edit(cls: QMainWindow, copy_text: str):
     copy_line_edit.setReadOnly(True)
     copy_line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-    copy_action = QAction(cls.style().standardIcon(QStyle.StandardPixmap.SP_FileIcon), "")
+    copy_action = QAction(QIcon(icon.copy), "")
     copy_action.triggered.connect(
         lambda: copy_to_clipboard(copy_line_edit.text())
     )
@@ -90,6 +91,12 @@ def set_copy_line_edit(cls: QMainWindow, copy_text: str):
     copy_line_edit.setFixedWidth(copy_line_edit_width + 35)
 
     return copy_line_edit, copy_action
+
+def set_push_button_icon(icon_path: str):
+    button = QPushButton()
+    button.setIcon(QIcon(icon_path))
+
+    return button
 
 def reset_ui_message():
     message_box = QMessageBox()

@@ -50,6 +50,12 @@ class GlossaryTag:
     annotation: str
 
 @dataclass_pre_init
+class PromptOptions:
+    prompt_config_file: str
+    prompt_config_file_example: str
+    dynamic_glossary: str
+
+@dataclass_pre_init
 class PromptsArea:
     translation_prompt: str
     translation_prompt_example: str
@@ -57,6 +63,7 @@ class PromptsArea:
     glossary_prompt: str
     glossary_prompt_example: str
     glossary_tag: GlossaryTag
+    prompt_options: PromptOptions
 
 @dataclass_pre_init
 class LlmApiTab:

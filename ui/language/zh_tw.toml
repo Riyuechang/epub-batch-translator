@@ -50,6 +50,11 @@ source_text = "原文標籤"
 translation = "譯文標籤"
 annotation = "註解標籤"
 
+[prompts_area.prompt_options]
+prompt_config_file = "提示詞設定檔"
+prompt_config_file_example = "檔案名"
+dynamic_glossary = "動態術語表"
+
 [llm_api_tab]
 tab_name = "語言模型 API"
 

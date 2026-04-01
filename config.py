@@ -13,6 +13,17 @@ USER_CONFIG_PATH = USER_DATA_PATH.joinpath("config.json")
 
 
 @dataclass_pre_init
+class UiConfig:
+    width: int
+    height: int
+    language: str
+
+@dataclass_pre_init
+class EpubConfig:
+    epub_folder_path: str
+    subfolder: bool
+
+@dataclass_pre_init
 class TranslationTag:
     content: str
     glossary: str
@@ -25,15 +36,8 @@ class GlossaryTag:
     annotation: str
 
 @dataclass_pre_init
-class EpubConfig:
-    epub_folder_path: str
-    subfolder: bool
-
-@dataclass_pre_init
-class UiConfig:
-    width: int
-    height: int
-    language: str
+class PromptOptions:
+    dynamic_glossary: bool
 
 @dataclass_pre_init
 class Config:
@@ -41,6 +45,7 @@ class Config:
     epub: EpubConfig
     translation_tag: TranslationTag
     glossary_tag: GlossaryTag
+    prompt_options: PromptOptions
 
     def __post_init__(self):
         self.load_config()

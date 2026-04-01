@@ -16,3 +16,6 @@ history = "{history}"
 source_text = "{source_text}"
 translation = "{translation}"
 annotation = "{annotation}"
+
+[prompt_options]
+dynamic_glossary = true
