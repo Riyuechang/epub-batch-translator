@@ -30,22 +30,25 @@ class Folder:
 
     @staticmethod
     def open(
+        set_text_func: Callable[[], None], 
         set_config: EpubConfig | GlossaryConfig, 
-        set_text_func: Callable[[], None]
+        combo_box: QComboBox, 
+        pattern: Literal["epub", "json"]
     ):
         folder_path = QFileDialog.getExistingDirectory(directory=set_config.folder_path)
 
         if folder_path:
             set_text_func(folder_path)
+            set_config.folder_path = folder_path
+            Folder.read_files(folder_path, set_config, combo_box, pattern)
 
     @staticmethod
     def read_files(
-        set_config: EpubConfig | GlossaryConfig, 
         text: str, 
+        set_config: EpubConfig | GlossaryConfig, 
         combo_box: QComboBox, 
         pattern: Literal["epub", "json"]
     ):
-        set_config.folder_path = text
         folder_path = Path(text)
 
         if set_config.subfolder:
@@ -64,13 +67,13 @@ class Folder:
 
     @staticmethod
     def set_subfolder(
-        set_config: EpubConfig | GlossaryConfig, 
         state: bool, 
+        set_config: EpubConfig | GlossaryConfig, 
         combo_box: QComboBox, 
         pattern: Literal['epub', 'json']
     ):
         set_config.subfolder = state
-        Folder.read_files(set_config, set_config.folder_path, combo_box, pattern)
+        Folder.read_files(set_config.folder_path, set_config, combo_box, pattern)
 
 class SetWidget:
 
@@ -80,6 +83,7 @@ class SetWidget:
         layout: QHBoxLayout
         path_label: QLabel
         path_line_edit: QLineEdit
+        refresh_button: QPushButton
         open_folder_button: QPushButton
         subfolder_check_box: QCheckBox
 
@@ -119,6 +123,10 @@ class SetWidget:
         path_line_edit.setText(default_path)
         layout.addWidget(path_line_edit)
 
+        refresh_button = QPushButton()
+        refresh_button.setIcon(QIcon(icon.refresh))
+        layout.addWidget(refresh_button)
+
         open_folder_button = QPushButton()
         open_folder_button.setIcon(QIcon(icon.folder_open))
         layout.addWidget(open_folder_button)
@@ -131,6 +139,7 @@ class SetWidget:
             layout=layout,
             path_label=path_label,
             path_line_edit=path_line_edit,
+            refresh_button=refresh_button,
             open_folder_button=open_folder_button,
             subfolder_check_box=subfolder_check_box
         )
@@ -177,19 +186,22 @@ class SetConnect:
 
     @staticmethod
     def select_path(
-        set_config: EpubConfig | GlossaryConfig,
         widget: SetWidget.SelectPathWidget, 
+        set_config: EpubConfig | GlossaryConfig,
         combo_box: QComboBox,
         pattern: Literal['epub', 'json']
     ):
-        widget.path_line_edit.textChanged.connect(
-            lambda text: Folder.read_files(set_config, text, combo_box, pattern)
+        widget.path_line_edit.returnPressed.connect(
+            lambda: Folder.read_files(widget.path_line_edit.text(), set_config, combo_box, pattern)
+        )
+        widget.refresh_button.clicked.connect(
+            lambda: Folder.read_files(widget.path_line_edit.text(), set_config, combo_box, pattern)
         )
         widget.open_folder_button.clicked.connect(
-            lambda: Folder.open(set_config, widget.path_line_edit.setText)
+            lambda: Folder.open(widget.path_line_edit.setText, set_config, combo_box, pattern)
         )
         widget.subfolder_check_box.clicked.connect(
-            lambda state: Folder.set_subfolder(set_config, state, combo_box, pattern)
+            lambda state: Folder.set_subfolder(state, set_config, combo_box, pattern)
         )
 
 

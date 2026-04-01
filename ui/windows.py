@@ -68,8 +68,8 @@ class MainWindow(QMainWindow):
         self.set_main_layout()
         self.set_connect()
 
-        Folder.read_files(config.epub, config.epub.folder_path, self.epub_combo_box, "epub")
-        Folder.read_files(config.glossary, config.glossary.folder_path, self.glossary_combo_box, "json")
+        Folder.read_files(config.epub.folder_path, config.epub, self.epub_combo_box, "epub")
+        Folder.read_files(config.glossary.folder_path, config.glossary, self.glossary_combo_box, "json")
 
         set_language(self.widgets_set_language_func)
 
@@ -428,6 +428,6 @@ class MainWindow(QMainWindow):
             )
         )
         self.about_action.triggered.connect(about_message)
-        SetConnect.select_path(config.epub, self.epub_folder_widget, self.epub_combo_box, "epub")
-        SetConnect.select_path(config.glossary, self.glossary_folder_widget, self.glossary_combo_box, "json")
+        SetConnect.select_path(self.epub_folder_widget, config.epub, self.epub_combo_box, "epub")
+        SetConnect.select_path(self.glossary_folder_widget, config.glossary, self.glossary_combo_box, "json")
         self.dynamic_glossary_check_box.clicked.connect(set_dynamic_glossary_state)
