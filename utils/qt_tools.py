@@ -1,60 +1,183 @@
 import sys
 from pathlib import Path
+from dataclasses import dataclass
 from collections.abc import Callable
+from typing import Literal
 
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QProcess, Qt
 from PyQt6.QtWidgets import (
     QMainWindow,
     QApplication, 
+    QHBoxLayout,
     QFileDialog, 
     QFrame, 
+    QLabel,
     QMessageBox, 
     QPushButton,
+    QCheckBox,
     QComboBox,
-    QLineEdit
+    QLineEdit,
+    QSizePolicy
 )
 
-from config import config
+from config import config, EpubConfig, GlossaryConfig
 from ui.image import icon
 from ui.content import language
 from utils.common_tools import remove_user_config
 
-
-class Epub:
+class Folder:
 
 
     @staticmethod
-    def open_folder(set_text_func: Callable[[], None]):
-        folder_path = QFileDialog.getExistingDirectory(directory=config.epub.epub_folder_path)
+    def open(
+        set_config: EpubConfig | GlossaryConfig, 
+        set_text_func: Callable[[], None]
+    ):
+        folder_path = QFileDialog.getExistingDirectory(directory=set_config.folder_path)
 
         if folder_path:
             set_text_func(folder_path)
 
     @staticmethod
-    def read(text: str, combo_box: QComboBox):
-        config.epub.epub_folder_path = text
+    def read_files(
+        set_config: EpubConfig | GlossaryConfig, 
+        text: str, 
+        combo_box: QComboBox, 
+        pattern: Literal["epub", "json"]
+    ):
+        set_config.folder_path = text
         folder_path = Path(text)
 
-        if config.epub.subfolder:
-            epub_files = [str(file.relative_to(folder_path)) for file in folder_path.rglob("*.epub") if file.is_file()]
+        if set_config.subfolder:
+            epub_files = [str(file.relative_to(folder_path)) for file in folder_path.rglob(f"*.{pattern}") if file.is_file()]
         else:
-            epub_files = [file.name for file in folder_path.glob("*.epub") if file.is_file()]
+            epub_files = [file.name for file in folder_path.glob(f"*.{pattern}") if file.is_file()]
 
         epub_files.sort()
 
+        combo_box_first_item_text = combo_box.itemText(0)
         combo_box.clear()
-        combo_box.addItems([language.epub_widget.select_all_epub_flies] + epub_files)
+        combo_box.addItems([combo_box_first_item_text] + epub_files)
 
     @staticmethod
-    def set_subfolder(state: bool, combo_box: QComboBox):
-        config.epub.subfolder = state
-        Epub.read(config.epub.epub_folder_path, combo_box)
+    def set_subfolder(
+        set_config: EpubConfig | GlossaryConfig, 
+        state: bool, 
+        combo_box: QComboBox, 
+        pattern: Literal['epub', 'json']
+    ):
+        set_config.subfolder = state
+        Folder.read_files(set_config, set_config.folder_path, combo_box, pattern)
+
+class SetWidget:
 
 
-def copy_to_clipboard(text: str):
-    clipboard = QApplication.clipboard()
-    clipboard.setText(text)
+    @dataclass
+    class SelectPathWidget:
+        layout: QHBoxLayout
+        path_label: QLabel
+        path_line_edit: QLineEdit
+        open_folder_button: QPushButton
+        subfolder_check_box: QCheckBox
+
+
+    @staticmethod
+    def files_combo_box():
+        combo_box = QComboBox()
+        combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        combo_box.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        combo_box.setEditable(True)
+        combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
+        combo_box.lineEdit().setReadOnly(True)
+        combo_box.addItem("none")
+
+        return combo_box
+
+    @staticmethod
+    def select_path_widget(
+        default_path: str,
+        default_subfolder: str
+    ):
+        layout = QHBoxLayout()
+
+        path_label = QLabel()
+        layout.addWidget(path_label)
+
+        path_line_edit = QLineEdit()
+        path_line_edit.setText(default_path)
+        layout.addWidget(path_line_edit)
+
+        open_folder_button = QPushButton()
+        open_folder_button.setIcon(QIcon(icon.folder_open))
+        layout.addWidget(open_folder_button)
+
+        subfolder_check_box = QCheckBox()
+        subfolder_check_box.setChecked(default_subfolder)
+        layout.addWidget(subfolder_check_box)
+
+        return SetWidget.SelectPathWidget(
+            layout=layout,
+            path_label=path_label,
+            path_line_edit=path_line_edit,
+            open_folder_button=open_folder_button,
+            subfolder_check_box=subfolder_check_box
+        )
+
+    @staticmethod
+    def frame():
+        frame = QFrame()
+        frame.setFrameShape(QFrame.Shape.HLine)
+        frame.setFrameShadow(QFrame.Shadow.Sunken)
+
+        return frame
+
+    @staticmethod
+    def copy_line_edit(cls: QMainWindow, copy_text: str):
+        copy_line_edit = QLineEdit()
+
+        copy_line_edit.setText(copy_text)
+        copy_line_edit.setReadOnly(True)
+        copy_line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        copy_action = QAction(QIcon(icon.copy), "")
+        copy_action.triggered.connect(
+            lambda: copy_to_clipboard(copy_line_edit.text())
+        )
+        copy_line_edit.addAction(copy_action, QLineEdit.ActionPosition.TrailingPosition)
+
+        copy_line_edit_width = copy_line_edit.fontMetrics().horizontalAdvance(copy_line_edit.text())
+        copy_line_edit.setFixedWidth(copy_line_edit_width + 35)
+
+        return copy_line_edit, copy_action
+
+    @staticmethod
+    def push_button_icon(icon_path: str):
+        button = QPushButton()
+        button.setIcon(QIcon(icon_path))
+
+        return button
+
+class SetConnect:
+
+
+    @staticmethod
+    def select_path(
+        set_config: EpubConfig | GlossaryConfig,
+        widget: SetWidget.SelectPathWidget, 
+        combo_box: QComboBox,
+        pattern: Literal['epub', 'json']
+    ):
+        widget.path_line_edit.textChanged.connect(
+            lambda text: Folder.read_files(set_config, text, combo_box, pattern)
+        )
+        widget.open_folder_button.clicked.connect(
+            lambda: Folder.open(set_config, widget.path_line_edit.setText)
+        )
+        widget.subfolder_check_box.clicked.connect(
+            lambda state: Folder.set_subfolder(set_config, state, combo_box, pattern)
+        )
+
 
 def set_language(
     widgets_set_language_func: list[Callable[[], None]],
@@ -67,36 +190,9 @@ def set_language(
     for set_language_func in widgets_set_language_func:
         set_language_func()
 
-def set_frame():
-    frame = QFrame()
-    frame.setFrameShape(QFrame.Shape.HLine)
-    frame.setFrameShadow(QFrame.Shadow.Sunken)
-
-    return frame
-
-def set_copy_line_edit(cls: QMainWindow, copy_text: str):
-    copy_line_edit = QLineEdit()
-
-    copy_line_edit.setText(copy_text)
-    copy_line_edit.setReadOnly(True)
-    copy_line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-    copy_action = QAction(QIcon(icon.copy), "")
-    copy_action.triggered.connect(
-        lambda: copy_to_clipboard(copy_line_edit.text())
-    )
-    copy_line_edit.addAction(copy_action, QLineEdit.ActionPosition.TrailingPosition)
-
-    copy_line_edit_width = copy_line_edit.fontMetrics().horizontalAdvance(copy_line_edit.text())
-    copy_line_edit.setFixedWidth(copy_line_edit_width + 35)
-
-    return copy_line_edit, copy_action
-
-def set_push_button_icon(icon_path: str):
-    button = QPushButton()
-    button.setIcon(QIcon(icon_path))
-
-    return button
+def copy_to_clipboard(text: str):
+    clipboard = QApplication.clipboard()
+    clipboard.setText(text)
 
 def reset_ui_message():
     message_box = QMessageBox()

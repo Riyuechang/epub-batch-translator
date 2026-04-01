@@ -6,10 +6,16 @@ about = "about"
 menu_name = "settings"
 reset_ui = "reset ui"
 
-[epub_widget]
-select_all_epub_flies = "-- ALL epub --"
-open_epub_folder = "open folder"
+[folder_options]
 subfolder = "subfolder"
+
+[epub_widget]
+select_all_epub_files = "-- ALL epub --"
+folder_path = "epub folder path"
+
+[glossary_widget]
+auto_glossary = "-- Auto Glossary --"
+folder_path = "glossary folder path"
 
 [processing_stage]
 select_translator = "translator"

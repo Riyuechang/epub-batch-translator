@@ -6,10 +6,16 @@ about = "關於"
 menu_name = "設定"
 reset_ui = "重置 UI"
 
-[epub_widget]
-select_all_epub_flies = "-- 所有 epub --"
-open_epub_folder = "選擇資料夾"
+[folder_options]
 subfolder = "子資料夾"
+
+[epub_widget]
+select_all_epub_files = "-- 所有 epub --"
+folder_path = "epub 資料夾路徑"
+
+[glossary_widget]
+auto_glossary = "-- 自動術語表 --"
+folder_path = "術語表資料夾路徑"
 
 [processing_stage]
 select_translator = "翻譯器"

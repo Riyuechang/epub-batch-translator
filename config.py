@@ -20,7 +20,12 @@ class UiConfig:
 
 @dataclass_pre_init
 class EpubConfig:
-    epub_folder_path: str
+    folder_path: str
+    subfolder: bool
+
+@dataclass_pre_init
+class GlossaryConfig:
+    folder_path: str
     subfolder: bool
 
 @dataclass_pre_init
@@ -43,6 +48,7 @@ class PromptOptions:
 class Config:
     ui: UiConfig
     epub: EpubConfig
+    glossary: GlossaryConfig
     translation_tag: TranslationTag
     glossary_tag: GlossaryTag
     prompt_options: PromptOptions

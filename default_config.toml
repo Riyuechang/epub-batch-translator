@@ -4,7 +4,11 @@ height = 800
 language = "zh_tw"
 
 [epub]
-epub_folder_path = ""
+folder_path = ""
+subfolder = false
+
+[glossary]
+folder_path = ""
 subfolder = false
 
 [translation_tag]

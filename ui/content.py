@@ -20,10 +20,18 @@ class MenuBar:
     about: str
 
 @dataclass_pre_init
-class EpubWidget:
-    select_all_epub_flies: str
-    open_epub_folder: str
+class FolderOptions:
     subfolder: str
+
+@dataclass_pre_init
+class EpubWidget:
+    select_all_epub_files: str
+    folder_path: str
+
+@dataclass_pre_init
+class GlossaryWidget:
+    auto_glossary: str
+    folder_path: str
 
 @dataclass_pre_init
 class ProcessingStage:
@@ -89,7 +97,9 @@ class AboutMessage:
 @dataclass_pre_init
 class Language:
     menu_bar: MenuBar
+    folder_options: FolderOptions
     epub_widget: EpubWidget
+    glossary_widget: GlossaryWidget
     processing_stage: ProcessingStage
     prompts_area: PromptsArea
     llm_api_tab: LlmApiTab

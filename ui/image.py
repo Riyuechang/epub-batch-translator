@@ -9,6 +9,7 @@ ICON_PATH = Path("./ui/icon")
 
 @dataclass_pre_init
 class Icon:
+    folder_open: str
     copy: str
     save: str
     delete: str

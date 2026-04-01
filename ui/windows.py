@@ -1,4 +1,5 @@
 import os
+from collections.abc import Callable
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QCursor, QActionGroup, QAction
@@ -16,19 +17,17 @@ from PyQt6.QtWidgets import (
     QCheckBox,
     QLineEdit,
     QPlainTextEdit,
-    QProgressBar,
-    QSizePolicy
+    QProgressBar
 )
 
 from config import config
 from ui.image import icon
 from ui.content import language
 from utils.qt_tools import (
-    Epub,
+    Folder,
+    SetWidget,
+    SetConnect,
     set_language, 
-    set_frame, 
-    set_copy_line_edit,
-    set_push_button_icon,
     reset_ui_message, 
     about_message
 )
@@ -62,7 +61,7 @@ class MainWindow(QMainWindow):
         self.move(window_geometry.topLeft())
 
     def set_ui(self):
-        self.widgets_set_language_func = []
+        self.widgets_set_language_func: list[Callable[[], None]] = []
 
         self.setFocus()
         self.set_menu()
@@ -70,8 +69,10 @@ class MainWindow(QMainWindow):
         self.set_connect()
 
         set_language(self.widgets_set_language_func)
-        Epub.read(config.epub.epub_folder_path, self.epub_combo_box)
-    
+
+        Folder.read_files(config.epub, config.epub.folder_path, self.epub_combo_box, "epub")
+        Folder.read_files(config.glossary, config.glossary.folder_path, self.glossary_combo_box, "json")
+
     def set_menu(self):
         self.menu_bar = self.menuBar()
 
@@ -123,14 +124,15 @@ class MainWindow(QMainWindow):
         self.main_container.setLayout(self.main_layout)
         self.setCentralWidget(self.main_container)
 
-        self.epub_path_line_edit = QLineEdit()
-        self.epub_path_line_edit.setText(config.epub.epub_folder_path)
-        self.main_layout.addWidget(self.epub_path_line_edit)
-
         self.set_epub_widget_layout()
 
-        self.line_frame = set_frame()
-        self.main_layout.addWidget(self.line_frame)
+        self.epub_widget_layout_frame = SetWidget.frame()
+        self.main_layout.addWidget(self.epub_widget_layout_frame)
+
+        self.set_glossary_widget_layout()
+
+        self.glossary_widget_layout_frame = SetWidget.frame()
+        self.main_layout.addWidget(self.glossary_widget_layout_frame)
 
         self.set_translator_layout()
 
@@ -149,41 +151,41 @@ class MainWindow(QMainWindow):
             lambda: self.stage_label.setText(language.processing_stage.no_task)
         )
 
-        self.line2_frame = set_frame()
-        self.main_layout.addWidget(self.line2_frame)
+        self.processing_layout_frame = SetWidget.frame()
+        self.main_layout.addWidget(self.processing_layout_frame)
 
         self.set_processing_layout()
 
     def set_epub_widget_layout(self):
-        self.epub_widget_layout = QHBoxLayout()
-        self.main_layout.addLayout(self.epub_widget_layout)
-
-        self.open_folder_button = QPushButton()
-        self.epub_widget_layout.addWidget(self.open_folder_button)
+        self.epub_widget_layout = SetWidget.select_path_widget(config.epub.folder_path, config.epub.subfolder)
+        self.main_layout.addLayout(self.epub_widget_layout.layout)
         self.widgets_set_language_func.append(
-            lambda: self.open_folder_button.setText(language.epub_widget.open_epub_folder)
+            lambda: self.epub_widget_layout.path_label.setText(language.epub_widget.folder_path)
+        )
+        self.widgets_set_language_func.append(
+            lambda: self.epub_widget_layout.subfolder_check_box.setText(language.folder_options.subfolder)
         )
 
-        self.epub_combo_box = QComboBox()
-        self.epub_combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
-        self.epub_combo_box.setEditable(True)
-        self.epub_combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
-
-        self.epub_combo_box_line_edit = self.epub_combo_box.lineEdit()
-        self.epub_combo_box_line_edit.setReadOnly(True)
-        self.epub_combo_box_line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-        self.epub_combo_box.addItem("none")
-        self.epub_widget_layout.addWidget(self.epub_combo_box, 1)
+        self.epub_combo_box = SetWidget.files_combo_box()
+        self.main_layout.addWidget(self.epub_combo_box)
         self.widgets_set_language_func.append(
-            lambda: self.epub_combo_box.setItemText(0, language.epub_widget.select_all_epub_flies)
+            lambda: self.epub_combo_box.setItemText(0, language.epub_widget.select_all_epub_files)
         )
 
-        self.subfolder_check_box = QCheckBox()
-        self.subfolder_check_box.setChecked(config.epub.subfolder)
-        self.epub_widget_layout.addWidget(self.subfolder_check_box)
+    def set_glossary_widget_layout(self):
+        self.glossary_widget_layout = SetWidget.select_path_widget(config.glossary.folder_path, config.glossary.subfolder)
+        self.main_layout.addLayout(self.glossary_widget_layout.layout)
         self.widgets_set_language_func.append(
-            lambda: self.subfolder_check_box.setText(language.epub_widget.subfolder)
+            lambda: self.glossary_widget_layout.path_label.setText(language.glossary_widget.folder_path)
+        )
+        self.widgets_set_language_func.append(
+            lambda: self.glossary_widget_layout.subfolder_check_box.setText(language.folder_options.subfolder)
+        )
+
+        self.glossary_combo_box = SetWidget.files_combo_box()
+        self.main_layout.addWidget(self.glossary_combo_box)
+        self.widgets_set_language_func.append(
+            lambda: self.glossary_combo_box.setItemText(0, language.glossary_widget.auto_glossary)
         )
 
     def set_translator_layout(self):
@@ -235,7 +237,7 @@ class MainWindow(QMainWindow):
             lambda: self.content_tag_label.setText(language.prompts_area.translation_tag.content)
         )
 
-        self.content_tag_line_edit, self.content_tag_copy_action = set_copy_line_edit(self, config.translation_tag.content)
+        self.content_tag_line_edit, self.content_tag_copy_action = SetWidget.copy_line_edit(self, config.translation_tag.content)
         self.translation_prompt_label_layout.addWidget(self.content_tag_line_edit)
 
         self.glossary_tag_label = QLabel()
@@ -244,7 +246,7 @@ class MainWindow(QMainWindow):
             lambda: self.glossary_tag_label.setText(language.prompts_area.translation_tag.glossary)
         )
 
-        self.glossary_tag_line_edit, self.glossary_tag_copy_action = set_copy_line_edit(self, config.translation_tag.glossary)
+        self.glossary_tag_line_edit, self.glossary_tag_copy_action = SetWidget.copy_line_edit(self, config.translation_tag.glossary)
         self.translation_prompt_label_layout.addWidget(self.glossary_tag_line_edit)
 
         self.history_tag_label = QLabel()
@@ -253,7 +255,7 @@ class MainWindow(QMainWindow):
             lambda: self.history_tag_label.setText(language.prompts_area.translation_tag.history)
         )
 
-        self.history_tag_line_edit, self.history_tag_copy_action = set_copy_line_edit(self, config.translation_tag.history)
+        self.history_tag_line_edit, self.history_tag_copy_action = SetWidget.copy_line_edit(self, config.translation_tag.history)
         self.translation_prompt_label_layout.addWidget(self.history_tag_line_edit)
 
     def set_glossary_prompt_label_layout(self):
@@ -276,7 +278,7 @@ class MainWindow(QMainWindow):
             lambda: self.source_text_tag_label.setText(language.prompts_area.glossary_tag.source_text)
         )
 
-        self.source_text_tag_line_edit, self.source_text_tag_copy_action = set_copy_line_edit(self, config.glossary_tag.source_text)
+        self.source_text_tag_line_edit, self.source_text_tag_copy_action = SetWidget.copy_line_edit(self, config.glossary_tag.source_text)
         self.glossary_prompt_label_layout.addWidget(self.source_text_tag_line_edit)
 
         self.translation_tag_label = QLabel()
@@ -285,7 +287,7 @@ class MainWindow(QMainWindow):
             lambda: self.translation_tag_label.setText(language.prompts_area.glossary_tag.translation)
         )
 
-        self.translation_tag_line_edit, self.translation_tag_copy_action = set_copy_line_edit(self, config.glossary_tag.translation)
+        self.translation_tag_line_edit, self.translation_tag_copy_action = SetWidget.copy_line_edit(self, config.glossary_tag.translation)
         self.glossary_prompt_label_layout.addWidget(self.translation_tag_line_edit)
 
         self.annotation_tag_label = QLabel()
@@ -294,7 +296,7 @@ class MainWindow(QMainWindow):
             lambda: self.annotation_tag_label.setText(language.prompts_area.glossary_tag.annotation)
         )
 
-        self.annotation_tag_line_edit, self.annotation_tag_copy_action = set_copy_line_edit(self, config.glossary_tag.annotation)
+        self.annotation_tag_line_edit, self.annotation_tag_copy_action = SetWidget.copy_line_edit(self, config.glossary_tag.annotation)
         self.glossary_prompt_label_layout.addWidget(self.annotation_tag_line_edit)
 
     def set_prompt_options_layout(self):
@@ -318,13 +320,13 @@ class MainWindow(QMainWindow):
             lambda: self.prompt_config_combo_box_line_edit.setPlaceholderText(language.prompts_area.prompt_options.prompt_config_file_example)
         )
 
-        self.refresh_button = set_push_button_icon(icon.refresh)
+        self.refresh_button = SetWidget.push_button_icon(icon.refresh)
         self.prompt_options_layout.addWidget(self.refresh_button)
 
-        self.save_button = set_push_button_icon(icon.save)
+        self.save_button = SetWidget.push_button_icon(icon.save)
         self.prompt_options_layout.addWidget(self.save_button)
 
-        self.delete_button = set_push_button_icon(icon.delete)
+        self.delete_button = SetWidget.push_button_icon(icon.delete)
         self.prompt_options_layout.addWidget(self.delete_button)
 
         self.prompt_options_layout.addStretch(1)
@@ -426,13 +428,6 @@ class MainWindow(QMainWindow):
             )
         )
         self.about_action.triggered.connect(about_message)
-        self.epub_path_line_edit.textChanged.connect(
-            lambda text: Epub.read(text, self.epub_combo_box)
-        )
-        self.open_folder_button.clicked.connect(
-            lambda: Epub.open_folder(self.epub_path_line_edit.setText)
-        )
-        self.subfolder_check_box.clicked.connect(
-            lambda state: Epub.set_subfolder(state, self.epub_combo_box)
-        )
+        SetConnect.select_path(config.epub, self.epub_widget_layout, self.epub_combo_box, "epub")
+        SetConnect.select_path(config.glossary, self.glossary_widget_layout, self.glossary_combo_box, "json")
         self.dynamic_glossary_check_box.clicked.connect(set_dynamic_glossary_state)
