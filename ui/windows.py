@@ -237,8 +237,8 @@ class MainWindow(QMainWindow):
             lambda: self.content_tag_label.setText(language.prompts_area.translation_tag.content)
         )
 
-        self.content_tag_line_edit, self.content_tag_copy_action = SetWidget.copy_line_edit(self, config.translation_tag.content)
-        self.translation_prompt_label_layout.addWidget(self.content_tag_line_edit)
+        self.content_tag_line_edit = SetWidget.copy_line_edit(config.translation_tag.content)
+        self.translation_prompt_label_layout.addWidget(self.content_tag_line_edit.line_edit)
 
         self.glossary_tag_label = QLabel()
         self.translation_prompt_label_layout.addWidget(self.glossary_tag_label)
@@ -246,8 +246,8 @@ class MainWindow(QMainWindow):
             lambda: self.glossary_tag_label.setText(language.prompts_area.translation_tag.glossary)
         )
 
-        self.glossary_tag_line_edit, self.glossary_tag_copy_action = SetWidget.copy_line_edit(self, config.translation_tag.glossary)
-        self.translation_prompt_label_layout.addWidget(self.glossary_tag_line_edit)
+        self.glossary_tag_line_edit = SetWidget.copy_line_edit(config.translation_tag.glossary)
+        self.translation_prompt_label_layout.addWidget(self.glossary_tag_line_edit.line_edit)
 
         self.history_tag_label = QLabel()
         self.translation_prompt_label_layout.addWidget(self.history_tag_label)
@@ -255,8 +255,8 @@ class MainWindow(QMainWindow):
             lambda: self.history_tag_label.setText(language.prompts_area.translation_tag.history)
         )
 
-        self.history_tag_line_edit, self.history_tag_copy_action = SetWidget.copy_line_edit(self, config.translation_tag.history)
-        self.translation_prompt_label_layout.addWidget(self.history_tag_line_edit)
+        self.history_tag_line_edit = SetWidget.copy_line_edit(config.translation_tag.history)
+        self.translation_prompt_label_layout.addWidget(self.history_tag_line_edit.line_edit)
 
     def set_glossary_prompt_label_layout(self):
         self.glossary_prompt_label_layout = QHBoxLayout()
@@ -278,8 +278,8 @@ class MainWindow(QMainWindow):
             lambda: self.source_text_tag_label.setText(language.prompts_area.glossary_tag.source_text)
         )
 
-        self.source_text_tag_line_edit, self.source_text_tag_copy_action = SetWidget.copy_line_edit(self, config.glossary_tag.source_text)
-        self.glossary_prompt_label_layout.addWidget(self.source_text_tag_line_edit)
+        self.source_text_tag_line_edit = SetWidget.copy_line_edit(config.glossary_tag.source_text)
+        self.glossary_prompt_label_layout.addWidget(self.source_text_tag_line_edit.line_edit)
 
         self.translation_tag_label = QLabel()
         self.glossary_prompt_label_layout.addWidget(self.translation_tag_label)
@@ -287,8 +287,8 @@ class MainWindow(QMainWindow):
             lambda: self.translation_tag_label.setText(language.prompts_area.glossary_tag.translation)
         )
 
-        self.translation_tag_line_edit, self.translation_tag_copy_action = SetWidget.copy_line_edit(self, config.glossary_tag.translation)
-        self.glossary_prompt_label_layout.addWidget(self.translation_tag_line_edit)
+        self.translation_tag_line_edit = SetWidget.copy_line_edit(config.glossary_tag.translation)
+        self.glossary_prompt_label_layout.addWidget(self.translation_tag_line_edit.line_edit)
 
         self.annotation_tag_label = QLabel()
         self.glossary_prompt_label_layout.addWidget(self.annotation_tag_label)
@@ -296,8 +296,8 @@ class MainWindow(QMainWindow):
             lambda: self.annotation_tag_label.setText(language.prompts_area.glossary_tag.annotation)
         )
 
-        self.annotation_tag_line_edit, self.annotation_tag_copy_action = SetWidget.copy_line_edit(self, config.glossary_tag.annotation)
-        self.glossary_prompt_label_layout.addWidget(self.annotation_tag_line_edit)
+        self.annotation_tag_line_edit = SetWidget.copy_line_edit(config.glossary_tag.annotation)
+        self.glossary_prompt_label_layout.addWidget(self.annotation_tag_line_edit.line_edit)
 
     def set_prompt_options_layout(self):
         self.prompt_options_layout = QHBoxLayout()

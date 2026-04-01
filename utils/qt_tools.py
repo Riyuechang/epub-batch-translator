@@ -81,6 +81,11 @@ class SetWidget:
         open_folder_button: QPushButton
         subfolder_check_box: QCheckBox
 
+    @dataclass
+    class CopyLineEdit:
+        line_edit: QLineEdit
+        action: QAction
+
 
     @staticmethod
     def files_combo_box():
@@ -133,23 +138,26 @@ class SetWidget:
         return frame
 
     @staticmethod
-    def copy_line_edit(cls: QMainWindow, copy_text: str):
-        copy_line_edit = QLineEdit()
+    def copy_line_edit(text: str):
+        line_edit = QLineEdit()
 
-        copy_line_edit.setText(copy_text)
-        copy_line_edit.setReadOnly(True)
-        copy_line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        line_edit.setText(text)
+        line_edit.setReadOnly(True)
+        line_edit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-        copy_action = QAction(QIcon(icon.copy), "")
-        copy_action.triggered.connect(
-            lambda: copy_to_clipboard(copy_line_edit.text())
+        action = QAction(QIcon(icon.copy), "")
+        action.triggered.connect(
+            lambda: copy_to_clipboard(line_edit.text())
         )
-        copy_line_edit.addAction(copy_action, QLineEdit.ActionPosition.TrailingPosition)
+        line_edit.addAction(action, QLineEdit.ActionPosition.TrailingPosition)
 
-        copy_line_edit_width = copy_line_edit.fontMetrics().horizontalAdvance(copy_line_edit.text())
-        copy_line_edit.setFixedWidth(copy_line_edit_width + 35)
+        line_edit_width = line_edit.fontMetrics().horizontalAdvance(line_edit.text())
+        line_edit.setFixedWidth(line_edit_width + 35)
 
-        return copy_line_edit, copy_action
+        return SetWidget.CopyLineEdit(
+            line_edit=line_edit, 
+            action=action
+        )
 
     @staticmethod
     def push_button_icon(icon_path: str):
