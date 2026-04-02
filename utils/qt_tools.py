@@ -104,7 +104,7 @@ class SetWidget:
         combo_box.addItem("none")
 
         combo_box.currentTextChanged.connect(
-            lambda text: set_file_options(set_config, text)
+            lambda text: set_file_options(text, combo_box.currentIndex, set_config)
         )
 
         return combo_box

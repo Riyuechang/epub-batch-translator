@@ -1,5 +1,5 @@
-import re
 from pathlib import Path
+from collections.abc import Callable
 
 from config import config, USER_CONFIG_PATH, EpubConfig, GlossaryConfig
 
@@ -11,13 +11,14 @@ def set_dynamic_glossary_state(state: bool):
     config.prompt_options.dynamic_glossary = state
 
 def set_file_options(
-    set_config: EpubConfig | GlossaryConfig, 
-    text: str
+    text: str, 
+    current_index_func: Callable[[], int],
+    set_config: EpubConfig | GlossaryConfig
 ):
     if text == "":
         return
 
-    if re.match(r"-- .*? --", text):
+    if current_index_func() == 0:
         set_config.options = ""
         return
 
