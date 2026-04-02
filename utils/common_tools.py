@@ -24,6 +24,13 @@ def set_file_options(
 
     set_config.options = text
 
+def get_list_index(data_list: list, value):
+    for index, data in enumerate(data_list):
+        if data == value:
+            return index
+
+    return -1
+
 def get_path_dict(path: str | Path):
     if isinstance(path, str):
         path = Path(path)

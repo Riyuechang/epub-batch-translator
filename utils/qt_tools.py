@@ -23,7 +23,7 @@ from PyQt6.QtWidgets import (
 from config import config, EpubConfig, GlossaryConfig
 from ui.image import icon
 from ui.content import language
-from utils.common_tools import remove_user_config, set_file_options
+from utils.common_tools import remove_user_config, set_file_options, get_list_index
 
 class Folder:
 
@@ -52,17 +52,17 @@ class Folder:
         folder_path = Path(text)
 
         if set_config.subfolder:
-            epub_files = [str(file.relative_to(folder_path)) for file in folder_path.rglob(f"*.{pattern}") if file.is_file()]
+            files = [str(file.relative_to(folder_path)) for file in folder_path.rglob(f"*.{pattern}") if file.is_file()]
         else:
-            epub_files = [file.name for file in folder_path.glob(f"*.{pattern}") if file.is_file()]
+            files = [file.name for file in folder_path.glob(f"*.{pattern}") if file.is_file()]
 
-        epub_files.sort()
+        files.sort()
 
         combo_box_first_item_text = combo_box.itemText(0)
-        combo_box_index = epub_files.index(set_config.options) if set_config.options in epub_files else -1
+        combo_box_index = get_list_index(files, set_config.options)
 
         combo_box.clear()
-        combo_box.addItems([combo_box_first_item_text] + epub_files)
+        combo_box.addItems([combo_box_first_item_text] + files)
         combo_box.setCurrentIndex(combo_box_index + 1)
 
     @staticmethod
