@@ -20,7 +20,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy
 )
 
-from config import config, EpubConfig, GlossaryConfig
+from config import config, FolderConfig
 from ui.image import icon
 from ui.content import language
 from utils.common_tools import remove_user_config, set_file_options, get_list_index
@@ -31,7 +31,7 @@ class Folder:
     @staticmethod
     def open(
         set_text_func: Callable[[], None], 
-        set_config: EpubConfig | GlossaryConfig, 
+        set_config: FolderConfig, 
         combo_box: QComboBox, 
         pattern: Literal["epub", "json"]
     ):
@@ -44,12 +44,12 @@ class Folder:
 
     @staticmethod
     def read_files(
-        text: str, 
-        set_config: EpubConfig | GlossaryConfig, 
+        path: str, 
+        set_config: FolderConfig, 
         combo_box: QComboBox, 
         pattern: Literal["epub", "json"]
     ):
-        folder_path = Path(text)
+        folder_path = Path(path)
 
         if set_config.subfolder:
             files = [str(file.relative_to(folder_path)) for file in folder_path.rglob(f"*.{pattern}") if file.is_file()]
@@ -68,7 +68,7 @@ class Folder:
     @staticmethod
     def set_subfolder(
         state: bool, 
-        set_config: EpubConfig | GlossaryConfig, 
+        set_config: FolderConfig, 
         combo_box: QComboBox, 
         pattern: Literal['epub', 'json']
     ):
@@ -94,7 +94,7 @@ class SetWidget:
 
 
     @staticmethod
-    def files_combo_box(set_config: EpubConfig | GlossaryConfig):
+    def files_combo_box(set_config: FolderConfig):
         combo_box = QComboBox()
         combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         combo_box.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -187,7 +187,7 @@ class SetConnect:
     @staticmethod
     def select_path(
         widget: SetWidget.SelectPathWidget, 
-        set_config: EpubConfig | GlossaryConfig,
+        set_config: FolderConfig,
         combo_box: QComboBox,
         pattern: Literal['epub', 'json']
     ):

@@ -1,7 +1,7 @@
 from pathlib import Path
 from collections.abc import Callable
 
-from config import config, USER_CONFIG_PATH, EpubConfig, GlossaryConfig
+from config import config, USER_CONFIG_PATH, FolderConfig
 
 
 def remove_user_config():
@@ -13,7 +13,7 @@ def set_dynamic_glossary_state(state: bool):
 def set_file_options(
     text: str, 
     current_index_func: Callable[[], int],
-    set_config: EpubConfig | GlossaryConfig
+    set_config: FolderConfig
 ):
     if text == "":
         return
