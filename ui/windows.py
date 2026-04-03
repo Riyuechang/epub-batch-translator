@@ -27,9 +27,8 @@ from utils.qt_tools import (
     Folder,
     SetWidget,
     SetConnect,
+    Message, 
     set_language, 
-    reset_ui_message, 
-    about_message
 )
 from utils.common_tools import set_dynamic_glossary_state
 
@@ -420,14 +419,14 @@ class MainWindow(QMainWindow):
         )
 
     def set_connect(self):
-        self.reset_ui_action.triggered.connect(reset_ui_message)
+        self.reset_ui_action.triggered.connect(Message.reset_ui_message)
         self.language_group.triggered.connect(
             lambda ui_language: set_language(
                 self.widgets_set_language_func,
                 ui_language.text()
             )
         )
-        self.about_action.triggered.connect(about_message)
+        self.about_action.triggered.connect(Message.about_message)
         SetConnect.select_path(self.epub_folder_widget, config.epub, self.epub_combo_box, "epub")
         SetConnect.select_path(self.glossary_folder_widget, config.glossary, self.glossary_combo_box, "json")
         self.dynamic_glossary_check_box.clicked.connect(set_dynamic_glossary_state)

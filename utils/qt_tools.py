@@ -25,9 +25,8 @@ from ui.image import icon
 from ui.content import language
 from utils.common_tools import remove_user_config, set_file_options, get_list_index
 
+
 class Folder:
-
-
     @staticmethod
     def open(
         set_text_func: Callable[[], None], 
@@ -76,8 +75,6 @@ class Folder:
         Folder.read_files(set_config.folder_path, set_config, combo_box, pattern)
 
 class SetWidget:
-
-
     @dataclass
     class SelectPathWidget:
         layout: QHBoxLayout
@@ -182,8 +179,6 @@ class SetWidget:
         return button
 
 class SetConnect:
-
-
     @staticmethod
     def select_path(
         widget: SetWidget.SelectPathWidget, 
@@ -204,6 +199,38 @@ class SetConnect:
             lambda state: Folder.set_subfolder(state, set_config, combo_box, pattern)
         )
 
+class Message:
+    @staticmethod
+    def reset_ui_message():
+        message_box = QMessageBox()
+
+        message_box.setIcon(QMessageBox.Icon.Warning)
+        message_box.setWindowTitle(language.reset_ui_message.title)
+        message_box.setText(language.reset_ui_message.message)
+
+        action_button = message_box.addButton(language.reset_ui_message.confirm, QMessageBox.ButtonRole.ActionRole)
+        reject_button = message_box.addButton(language.reset_ui_message.cancel, QMessageBox.ButtonRole.RejectRole)
+
+        message_box.setDefaultButton(reject_button)
+        message_box.exec()
+
+        clicked_button = message_box.clickedButton()
+
+        if clicked_button == action_button:
+            QApplication.quit()
+            remove_user_config()
+            QProcess.startDetached(sys.executable, sys.argv)
+
+    @staticmethod
+    def about_message():
+        message_box = QMessageBox()
+
+        message_box.setWindowTitle(language.about_message.title)
+        message_box.setText(language.about_message.message)
+        message_box.setTextFormat(Qt.TextFormat.RichText)
+        message_box.addButton(language.about_message.confirm, QMessageBox.ButtonRole.AcceptRole)
+        message_box.exec()
+
 
 def set_language(
     widgets_set_language_func: list[Callable[[], None]],
@@ -219,32 +246,3 @@ def set_language(
 def copy_to_clipboard(text: str):
     clipboard = QApplication.clipboard()
     clipboard.setText(text)
-
-def reset_ui_message():
-    message_box = QMessageBox()
-
-    message_box.setIcon(QMessageBox.Icon.Warning)
-    message_box.setWindowTitle(language.reset_ui_message.title)
-    message_box.setText(language.reset_ui_message.message)
-
-    action_button = message_box.addButton(language.reset_ui_message.confirm, QMessageBox.ButtonRole.ActionRole)
-    reject_button = message_box.addButton(language.reset_ui_message.cancel, QMessageBox.ButtonRole.RejectRole)
-
-    message_box.setDefaultButton(reject_button)
-    message_box.exec()
-
-    clicked_button = message_box.clickedButton()
-
-    if clicked_button == action_button:
-        QApplication.quit()
-        remove_user_config()
-        QProcess.startDetached(sys.executable, sys.argv)
-
-def about_message():
-    message_box = QMessageBox()
-
-    message_box.setWindowTitle(language.about_message.title)
-    message_box.setText(language.about_message.message)
-    message_box.setTextFormat(Qt.TextFormat.RichText)
-    message_box.addButton(language.about_message.confirm, QMessageBox.ButtonRole.AcceptRole)
-    message_box.exec()
