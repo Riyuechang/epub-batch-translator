@@ -27,7 +27,6 @@ from utils.qt_tools import (
     Folder,
     ParameterFile,
     SetWidget,
-    SetConnect,
     Message, 
     set_language, 
     reset_ui
@@ -70,8 +69,8 @@ class MainWindow(QMainWindow):
         self.set_main_layout()
         self.set_connect()
 
-        Folder.read_files(config.epub.folder_path, config.epub, self.epub_combo_box, "epub")
-        Folder.read_files(config.glossary.folder_path, config.glossary, self.glossary_combo_box, "json")
+        Folder.read_files(config.epub.folder_path, config.epub, self.epub_folder_widget.file_combo_box, "epub")
+        Folder.read_files(config.glossary.folder_path, config.glossary, self.glossary_folder_widget.file_combo_box, "json")
         ParameterFile.load_combo_box(config.prompt_parameter, self.prompt_parameter_file_widget.file_combo_box)
 
         set_language(self.widgets_set_language_func)
@@ -90,6 +89,9 @@ class MainWindow(QMainWindow):
         )
 
         self.reset_ui_action = QAction()
+        self.reset_ui_action.triggered.connect(
+            lambda: Message.warning_message(language.reset_ui_message, reset_ui)
+        )
         self.settings_menu.addAction(self.reset_ui_action)
         self.widgets_set_language_func.append(
             lambda: self.reset_ui_action.setText(language.menu_bar.settings_menu.reset_ui)
@@ -102,6 +104,12 @@ class MainWindow(QMainWindow):
         )
 
         self.language_group = QActionGroup(self)
+        self.language_group.triggered.connect(
+            lambda ui_language: set_language(
+                self.widgets_set_language_func,
+                ui_language.text()
+            )
+        )
 
         self.language_actions: dict[str, QAction] = {dir.strip(".toml"): "" for dir in os.listdir("./ui/language") if dir.endswith(".toml")}
         for language_name in self.language_actions:
@@ -115,6 +123,7 @@ class MainWindow(QMainWindow):
 
     def set_about_menu(self):
         self.about_action = self.menu_bar.addAction("none")
+        self.about_action.triggered.connect(Message.about_message)
         self.widgets_set_language_func.append(
             lambda: self.about_action.setText(language.menu_bar.about)
         )
@@ -160,35 +169,31 @@ class MainWindow(QMainWindow):
         self.set_processing_layout()
 
     def set_epub_widget_layout(self):
-        self.epub_folder_widget = SetWidget.select_path_widget(config.epub.folder_path, config.epub.subfolder)
+        self.epub_folder_widget = SetWidget.select_path_widget(config.epub, "epub")
         self.main_layout.addLayout(self.epub_folder_widget.layout)
+        self.main_layout.addWidget(self.epub_folder_widget.file_combo_box)
         self.widgets_set_language_func.append(
             lambda: self.epub_folder_widget.path_label.setText(language.epub_widget.folder_path)
         )
         self.widgets_set_language_func.append(
             lambda: self.epub_folder_widget.subfolder_check_box.setText(language.folder_options.subfolder)
         )
-
-        self.epub_combo_box = SetWidget.files_combo_box(config.epub)
-        self.main_layout.addWidget(self.epub_combo_box)
         self.widgets_set_language_func.append(
-            lambda: self.epub_combo_box.setItemText(0, language.epub_widget.select_all_epub_files)
+            lambda: self.epub_folder_widget.file_combo_box.setItemText(0, language.epub_widget.select_all_epub_files)
         )
 
     def set_glossary_widget_layout(self):
-        self.glossary_folder_widget = SetWidget.select_path_widget(config.glossary.folder_path, config.glossary.subfolder)
+        self.glossary_folder_widget = SetWidget.select_path_widget(config.glossary, "json")
         self.main_layout.addLayout(self.glossary_folder_widget.layout)
+        self.main_layout.addWidget(self.glossary_folder_widget.file_combo_box)
         self.widgets_set_language_func.append(
             lambda: self.glossary_folder_widget.path_label.setText(language.glossary_widget.folder_path)
         )
         self.widgets_set_language_func.append(
             lambda: self.glossary_folder_widget.subfolder_check_box.setText(language.folder_options.subfolder)
         )
-
-        self.glossary_combo_box = SetWidget.files_combo_box(config.glossary)
-        self.main_layout.addWidget(self.glossary_combo_box)
         self.widgets_set_language_func.append(
-            lambda: self.glossary_combo_box.setItemText(0, language.glossary_widget.auto_glossary)
+            lambda: self.glossary_folder_widget.file_combo_box.setItemText(0, language.glossary_widget.auto_glossary)
         )
 
     def set_translator_layout(self):
@@ -326,6 +331,7 @@ class MainWindow(QMainWindow):
 
         self.dynamic_glossary_check_box = QCheckBox()
         self.dynamic_glossary_check_box.setChecked(config.prompt_options.dynamic_glossary)
+        self.dynamic_glossary_check_box.clicked.connect(set_dynamic_glossary_state)
         self.prompt_parameter_file_widget.layout.addWidget(self.dynamic_glossary_check_box)
         self.widgets_set_language_func.append(
             lambda: self.dynamic_glossary_check_box.setText(language.prompt_options.dynamic_glossary)
@@ -411,18 +417,3 @@ class MainWindow(QMainWindow):
         self.widgets_set_language_func.append(
             lambda: self.select_translator_combo_box.setItemText(1, language.vllm_tab.tab_name)
         )
-
-    def set_connect(self):
-        self.reset_ui_action.triggered.connect(
-            lambda: Message.warning_message(language.reset_ui_message, reset_ui)
-        )
-        self.language_group.triggered.connect(
-            lambda ui_language: set_language(
-                self.widgets_set_language_func,
-                ui_language.text()
-            )
-        )
-        self.about_action.triggered.connect(Message.about_message)
-        SetConnect.select_path(self.epub_folder_widget, config.epub, self.epub_combo_box, "epub")
-        SetConnect.select_path(self.glossary_folder_widget, config.glossary, self.glossary_combo_box, "json")
-        self.dynamic_glossary_check_box.clicked.connect(set_dynamic_glossary_state)

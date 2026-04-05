@@ -183,6 +183,7 @@ class SetWidget:
     @dataclass
     class SelectPathWidget:
         layout: QHBoxLayout
+        file_combo_box: QComboBox
         path_label: QLabel
         path_line_edit: QLineEdit
         refresh_button: QPushButton
@@ -205,25 +206,9 @@ class SetWidget:
 
 
     @staticmethod
-    def files_combo_box(set_config: FolderConfig):
-        combo_box = QComboBox()
-        combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
-        combo_box.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        combo_box.setEditable(True)
-        combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
-        combo_box.lineEdit().setReadOnly(True)
-        combo_box.addItem("none")
-
-        combo_box.currentTextChanged.connect(
-            lambda text: set_file_options(text, combo_box.currentIndex, set_config)
-        )
-
-        return combo_box
-
-    @staticmethod
     def select_path_widget(
-        default_path: str,
-        default_subfolder: str
+        set_config: FolderConfig,
+        pattern: Literal['epub', 'json']
     ):
         layout = QHBoxLayout()
 
@@ -231,7 +216,7 @@ class SetWidget:
         layout.addWidget(path_label)
 
         path_line_edit = QLineEdit()
-        path_line_edit.setText(default_path)
+        path_line_edit.setText(set_config.folder_path)
         layout.addWidget(path_line_edit)
 
         refresh_button = QPushButton()
@@ -243,11 +228,36 @@ class SetWidget:
         layout.addWidget(open_folder_button)
 
         subfolder_check_box = QCheckBox()
-        subfolder_check_box.setChecked(default_subfolder)
+        subfolder_check_box.setChecked(set_config.subfolder)
         layout.addWidget(subfolder_check_box)
+
+        file_combo_box = QComboBox()
+        file_combo_box.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        file_combo_box.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        file_combo_box.setEditable(True)
+        file_combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
+        file_combo_box.lineEdit().setReadOnly(True)
+        file_combo_box.addItem("none")
+
+        file_combo_box.currentTextChanged.connect(
+            lambda text: set_file_options(text, file_combo_box.currentIndex, set_config)
+        )
+        path_line_edit.returnPressed.connect(
+            lambda: Folder.read_files(path_line_edit.text(), set_config, file_combo_box, pattern)
+        )
+        refresh_button.clicked.connect(
+            lambda: Folder.read_files(path_line_edit.text(), set_config, file_combo_box, pattern)
+        )
+        open_folder_button.clicked.connect(
+            lambda: Folder.open(path_line_edit.setText, set_config, file_combo_box, pattern)
+        )
+        subfolder_check_box.clicked.connect(
+            lambda state: Folder.set_subfolder(state, set_config, file_combo_box, pattern)
+        )
 
         return SetWidget.SelectPathWidget(
             layout=layout,
+            file_combo_box=file_combo_box,
             path_label=path_label,
             path_line_edit=path_line_edit,
             refresh_button=refresh_button,
@@ -348,27 +358,6 @@ class SetWidget:
         button.setIcon(QIcon(icon_path))
 
         return button
-
-class SetConnect:
-    @staticmethod
-    def select_path(
-        widget: SetWidget.SelectPathWidget, 
-        set_config: FolderConfig,
-        combo_box: QComboBox,
-        pattern: Literal['epub', 'json']
-    ):
-        widget.path_line_edit.returnPressed.connect(
-            lambda: Folder.read_files(widget.path_line_edit.text(), set_config, combo_box, pattern)
-        )
-        widget.refresh_button.clicked.connect(
-            lambda: Folder.read_files(widget.path_line_edit.text(), set_config, combo_box, pattern)
-        )
-        widget.open_folder_button.clicked.connect(
-            lambda: Folder.open(widget.path_line_edit.setText, set_config, combo_box, pattern)
-        )
-        widget.subfolder_check_box.clicked.connect(
-            lambda state: Folder.set_subfolder(state, set_config, combo_box, pattern)
-        )
 
 class Message:
     @staticmethod
