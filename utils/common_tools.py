@@ -10,6 +10,9 @@ def remove_user_config():
 def set_dynamic_glossary_state(state: bool):
     config.prompt_options.dynamic_glossary = state
 
+def set_tabs_index(index: int):
+    config.ui.tabs_index = index
+
 def set_file_options(
     text: str, 
     current_index_func: Callable[[], int],

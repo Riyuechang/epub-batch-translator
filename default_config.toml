@@ -1,8 +1,9 @@
 [ui]
 window_title = "epub-batch-translator"
+language = "zh_tw"
 width = 1080
 height = 840
-language = "zh_tw"
+tabs_index = 0
 
 [epub]
 folder_path = ""

@@ -31,7 +31,7 @@ from utils.qt_tools import (
     set_language, 
     reset_ui
 )
-from utils.common_tools import set_dynamic_glossary_state
+from utils.common_tools import set_dynamic_glossary_state, set_tabs_index
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -345,6 +345,9 @@ class MainWindow(QMainWindow):
 
         self.tabs.addTab(self.llm_api_tab, "none")
         self.tabs.addTab(self.vllm_tab, "none")
+
+        self.tabs.setCurrentIndex(config.ui.tabs_index)
+        self.tabs.currentChanged.connect(set_tabs_index)
 
         self.widgets_set_language_func.append(
             lambda: self.tabs.setTabText(0, language.llm_api_tab.tab_name)
