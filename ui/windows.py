@@ -67,7 +67,6 @@ class MainWindow(QMainWindow):
         self.setFocus()
         self.set_menu()
         self.set_main_layout()
-        self.set_connect()
 
         Folder.read_files(config.epub.folder_path, config.epub, self.epub_folder_widget.file_combo_box, "epub")
         Folder.read_files(config.glossary.folder_path, config.glossary, self.glossary_folder_widget.file_combo_box, "json")
