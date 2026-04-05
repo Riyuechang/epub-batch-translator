@@ -1,6 +1,7 @@
 import sys
+import json
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from collections.abc import Callable
 from typing import Literal
 
@@ -8,6 +9,7 @@ from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QProcess, Qt
 from PyQt6.QtWidgets import (
     QApplication, 
+    QVBoxLayout,
     QHBoxLayout,
     QFileDialog, 
     QFrame, 
@@ -20,7 +22,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy
 )
 
-from config import config, FolderConfig
+from config import config, FolderConfig, ParameterFileConfig
 from ui.image import icon
 from ui.content import language
 from utils.common_tools import remove_user_config, set_file_options, get_list_index
@@ -74,6 +76,97 @@ class Folder:
         set_config.subfolder = state
         Folder.read_files(set_config.folder_path, set_config, combo_box, pattern)
 
+class ParameterFile:
+    @dataclass
+    class PromptParameter:
+        translation_prompt: str
+        glossary_prompt: str
+
+    @dataclass
+    class PromptParameterSetFunc:
+        translation_prompt: Callable[[str | None], None]
+        glossary_prompt: Callable[[str | None], None]
+
+    @staticmethod
+    def load_combo_box(
+        set_config: ParameterFileConfig, 
+        combo_box: QComboBox
+    ):
+        files = [file.stem for file in Path(set_config.folder_path).glob(f"*.json") if file.is_file()]
+        files.sort()
+
+        combo_box_index = get_list_index(files, set_config.options)
+
+        combo_box.clear()
+        combo_box.addItems(files)
+        combo_box.setCurrentIndex(combo_box_index)
+
+    @staticmethod
+    def save(
+        set_config: ParameterFileConfig,
+        combo_box: QComboBox,
+        dataclass_obj: object
+    ):
+        file_name = combo_box.currentText()
+        
+        if file_name == "":
+            return
+
+        folder_path = Path(set_config.folder_path)
+        folder_path.mkdir(parents=True, exist_ok=True)
+
+        parameter_file = folder_path.joinpath(f"{file_name}.json")
+
+        if parameter_file.is_file():
+            pass
+
+        with parameter_file.open('w', encoding='utf-8') as file:
+            json.dump(asdict(dataclass_obj), file, indent=4, ensure_ascii=False)
+
+        ParameterFile.load_combo_box(set_config, combo_box)
+
+    @staticmethod
+    def delete(
+        set_config: ParameterFileConfig,
+        combo_box: QComboBox
+    ):
+        file_name = combo_box.currentText()
+
+        if file_name == "":
+            return
+
+        Path(set_config.folder_path, f"{file_name}.json").unlink()
+        ParameterFile.load_combo_box(set_config, combo_box)
+
+    @staticmethod
+    def read(
+        file_name: str, 
+        set_config: ParameterFileConfig
+    ):
+        file_path = Path(set_config.folder_path, f"{file_name}.json")
+
+        with file_path.open("r", encoding="utf-8") as file:
+            parameter_data: dict[str, str] = json.load(file)
+
+        return parameter_data
+
+    @staticmethod
+    def load_parameter(
+        file_name: str, 
+        set_config: ParameterFileConfig,
+        parameter_set_func_dataclass: object
+    ):
+        if file_name == "":
+            return
+
+        set_config.options = file_name
+
+        parameter_data = ParameterFile.read(file_name, set_config)
+        parameter_set_func_dict = asdict(parameter_set_func_dataclass)
+
+        for key, value in parameter_data.items():
+            parameter_set_func_dict[key](value)
+
 class SetWidget:
     @dataclass
     class SelectPathWidget:
@@ -88,6 +181,15 @@ class SetWidget:
     class CopyLineEdit:
         line_edit: QLineEdit
         action: QAction
+
+    @dataclass
+    class ParameterFileWidget:
+        layout: QHBoxLayout | QVBoxLayout
+        file_label: QLabel
+        file_combo_box: QComboBox
+        refresh_button: QPushButton
+        save_button: QPushButton
+        delete_button: QPushButton
 
 
     @staticmethod
@@ -139,6 +241,63 @@ class SetWidget:
             refresh_button=refresh_button,
             open_folder_button=open_folder_button,
             subfolder_check_box=subfolder_check_box
+        )
+
+    @staticmethod
+    def set_parameter_file_widget(
+        set_config: ParameterFileConfig,
+        parameter_get_dataclass_func: Callable[[], object],
+        parameter_set_func_dataclass: object,
+        two_layers: bool = False
+    ):
+        layout = QHBoxLayout()
+
+        file_label = QLabel()
+        layout.addWidget(file_label)
+
+        if two_layers:
+            layout.addStretch(1)
+
+        file_combo_box = QComboBox()
+        file_combo_box.setEditable(True)
+        file_combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
+        file_combo_box.lineEdit().returnPressed.disconnect()
+        file_combo_box.currentTextChanged.connect(
+            lambda text: ParameterFile.load_parameter(text, set_config, parameter_set_func_dataclass)
+        )
+
+        if two_layers:
+            second_layout = QVBoxLayout()
+            second_layout.addLayout(layout)
+            second_layout.addWidget(file_combo_box)
+        else:
+            layout.addWidget(file_combo_box, 1)
+
+        refresh_button = SetWidget.push_button_icon(icon.refresh)
+        refresh_button.clicked.connect(
+            lambda: ParameterFile.load_combo_box(set_config, file_combo_box)
+        )
+        layout.addWidget(refresh_button)
+
+        save_button = SetWidget.push_button_icon(icon.save)
+        save_button.clicked.connect(
+            lambda: ParameterFile.save(set_config, file_combo_box, parameter_get_dataclass_func())
+        )
+        layout.addWidget(save_button)
+
+        delete_button = SetWidget.push_button_icon(icon.delete)
+        delete_button.clicked.connect(
+            lambda: ParameterFile.delete(set_config, file_combo_box)
+        )
+        layout.addWidget(delete_button)
+
+        return SetWidget.ParameterFileWidget(
+            layout=second_layout if two_layers else layout,
+            file_label=file_label,
+            file_combo_box=file_combo_box,
+            refresh_button=refresh_button,
+            save_button=save_button,
+            delete_button=delete_button
         )
 
     @staticmethod

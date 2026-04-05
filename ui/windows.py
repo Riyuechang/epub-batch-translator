@@ -25,6 +25,7 @@ from ui.image import icon
 from ui.content import language
 from utils.qt_tools import (
     Folder,
+    ParameterFile,
     SetWidget,
     SetConnect,
     Message, 
@@ -69,6 +70,7 @@ class MainWindow(QMainWindow):
 
         Folder.read_files(config.epub.folder_path, config.epub, self.epub_combo_box, "epub")
         Folder.read_files(config.glossary.folder_path, config.glossary, self.glossary_combo_box, "json")
+        ParameterFile.load_combo_box(config.prompt_parameter, self.prompt_parameter_file_widget.file_combo_box)
 
         set_language(self.widgets_set_language_func)
 
@@ -299,42 +301,32 @@ class MainWindow(QMainWindow):
         self.glossary_prompt_label_layout.addWidget(self.annotation_tag_line_edit.line_edit)
 
     def set_prompt_options_layout(self):
-        self.prompt_options_layout = QHBoxLayout()
-        self.prompt_layout.addLayout(self.prompt_options_layout)
-
-        self.prompt_config_file_label = QLabel()
-        self.prompt_options_layout.addWidget(self.prompt_config_file_label)
+        self.prompt_parameter_file_widget = SetWidget.set_parameter_file_widget(
+            config.prompt_parameter,
+            lambda: ParameterFile.PromptParameter(
+                translation_prompt=self.translation_prompt_text_edit.toPlainText(),
+                glossary_prompt=self.glossary_prompt_line_edit.text()
+            ),
+            ParameterFile.PromptParameterSetFunc(
+                translation_prompt=self.translation_prompt_text_edit.setPlainText,
+                glossary_prompt=self.glossary_prompt_line_edit.setText
+            )
+        )
+        self.prompt_layout.addLayout(self.prompt_parameter_file_widget.layout)
         self.widgets_set_language_func.append(
-            lambda: self.prompt_config_file_label.setText(language.prompts_area.prompt_options.prompt_config_file)
+            lambda: self.prompt_parameter_file_widget.file_label.setText(language.prompt_parameter.parameter_file)
+        )
+        self.widgets_set_language_func.append(
+            lambda: self.prompt_parameter_file_widget.file_combo_box.lineEdit().setPlaceholderText(language.prompt_parameter.parameter_file_example)
         )
 
-        self.prompt_config_combo_box = QComboBox()
-        self.prompt_config_combo_box.setEditable(True)
-        self.prompt_config_combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
-        self.prompt_options_layout.addWidget(self.prompt_config_combo_box, 1)
-
-        self.prompt_config_combo_box_line_edit = self.prompt_config_combo_box.lineEdit()
-        self.prompt_config_combo_box_line_edit.blockSignals(True)
-        self.widgets_set_language_func.append(
-            lambda: self.prompt_config_combo_box_line_edit.setPlaceholderText(language.prompts_area.prompt_options.prompt_config_file_example)
-        )
-
-        self.refresh_button = SetWidget.push_button_icon(icon.refresh)
-        self.prompt_options_layout.addWidget(self.refresh_button)
-
-        self.save_button = SetWidget.push_button_icon(icon.save)
-        self.prompt_options_layout.addWidget(self.save_button)
-
-        self.delete_button = SetWidget.push_button_icon(icon.delete)
-        self.prompt_options_layout.addWidget(self.delete_button)
-
-        self.prompt_options_layout.addStretch(1)
+        self.prompt_parameter_file_widget.layout.addStretch(1)
 
         self.dynamic_glossary_check_box = QCheckBox()
         self.dynamic_glossary_check_box.setChecked(config.prompt_options.dynamic_glossary)
-        self.prompt_options_layout.addWidget(self.dynamic_glossary_check_box)
+        self.prompt_parameter_file_widget.layout.addWidget(self.dynamic_glossary_check_box)
         self.widgets_set_language_func.append(
-            lambda: self.dynamic_glossary_check_box.setText(language.prompts_area.prompt_options.dynamic_glossary)
+            lambda: self.dynamic_glossary_check_box.setText(language.prompt_options.dynamic_glossary)
         )
 
     def set_tabs(self):

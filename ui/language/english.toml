@@ -56,9 +56,11 @@ source_text = "Source Text Tag"
 translation = "Translation Tag"
 annotation = "Annotation Tag"
 
-[prompts_area.prompt_options]
-prompt_config_file = "prompt config file"
-prompt_config_file_example = "file name"
+[prompt_parameter]
+parameter_file = "prompt config file"
+parameter_file_example = "file name"
+
+[prompt_options]
 dynamic_glossary = "dynamic glossary"
 
 [llm_api_tab]

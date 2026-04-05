@@ -58,12 +58,6 @@ class GlossaryTag:
     annotation: str
 
 @dataclass_pre_init
-class PromptOptions:
-    prompt_config_file: str
-    prompt_config_file_example: str
-    dynamic_glossary: str
-
-@dataclass_pre_init
 class PromptsArea:
     translation_prompt: str
     translation_prompt_example: str
@@ -71,7 +65,15 @@ class PromptsArea:
     glossary_prompt: str
     glossary_prompt_example: str
     glossary_tag: GlossaryTag
-    prompt_options: PromptOptions
+
+@dataclass_pre_init
+class PromptOptions:
+    dynamic_glossary: str
+
+@dataclass_pre_init
+class ParameterFile:
+    parameter_file: str
+    parameter_file_example: str
 
 @dataclass_pre_init
 class LlmApiTab:
@@ -102,6 +104,8 @@ class Language:
     glossary_widget: GlossaryWidget
     processing_stage: ProcessingStage
     prompts_area: PromptsArea
+    prompt_options: PromptOptions
+    prompt_parameter: ParameterFile
     llm_api_tab: LlmApiTab
     vllm_tab: VllmTab
     reset_ui_message: ResetUiMessage

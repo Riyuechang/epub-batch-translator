@@ -25,6 +25,15 @@ class FolderConfig:
     subfolder: bool
 
 @dataclass_pre_init
+class ParameterFileConfig:
+    folder_path: str
+    options: str
+
+@dataclass_pre_init
+class PromptOptions:
+    dynamic_glossary: bool
+
+@dataclass_pre_init
 class TranslationTag:
     content: str
     glossary: str
@@ -37,17 +46,14 @@ class GlossaryTag:
     annotation: str
 
 @dataclass_pre_init
-class PromptOptions:
-    dynamic_glossary: bool
-
-@dataclass_pre_init
 class Config:
     ui: UiConfig
     epub: FolderConfig
     glossary: FolderConfig
+    prompt_parameter: ParameterFileConfig
+    prompt_options: PromptOptions
     translation_tag: TranslationTag
     glossary_tag: GlossaryTag
-    prompt_options: PromptOptions
 
     def __post_init__(self):
         self.load_config()

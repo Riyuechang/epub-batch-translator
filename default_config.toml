@@ -13,6 +13,13 @@ folder_path = ""
 options = ""
 subfolder = false
 
+[prompt_parameter]
+folder_path = "./user_data/prompt_parameter"
+options = ""
+
+[prompt_options]
+dynamic_glossary = true
+
 [translation_tag]
 content = "{content}"
 glossary = "{glossary}"
@@ -22,6 +29,3 @@ history = "{history}"
 source_text = "{source_text}"
 translation = "{translation}"
 annotation = "{annotation}"
-
-[prompt_options]
-dynamic_glossary = true
