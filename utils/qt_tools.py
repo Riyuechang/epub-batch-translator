@@ -99,7 +99,7 @@ class ParameterFile:
 
         combo_box.clear()
         combo_box.addItems(files)
-        combo_box.setCurrentIndex(combo_box_index)
+        combo_box.setCurrentIndex(0 if combo_box_index == -1 else combo_box_index)
 
     @staticmethod
     def save(
@@ -111,6 +111,8 @@ class ParameterFile:
         
         if file_name == "":
             return
+        
+        set_config.options = file_name
 
         folder_path = Path(set_config.folder_path)
         folder_path.mkdir(parents=True, exist_ok=True)
@@ -139,29 +141,21 @@ class ParameterFile:
         ParameterFile.load_combo_box(set_config, combo_box)
 
     @staticmethod
-    def read(
-        file_name: str, 
-        set_config: ParameterFileConfig
-    ):
-        file_path = Path(set_config.folder_path, f"{file_name}.json")
-
-        with file_path.open("r", encoding="utf-8") as file:
-            parameter_data: dict[str, str] = json.load(file)
-
-        return parameter_data
-
-    @staticmethod
     def load_parameter(
         file_name: str, 
         set_config: ParameterFileConfig,
         parameter_set_func_dataclass: object
     ):
-        if file_name == "":
+        file_path = Path(set_config.folder_path, f"{file_name}.json")
+
+        if not file_path.is_file():
             return
 
         set_config.options = file_name
 
-        parameter_data = ParameterFile.read(file_name, set_config)
+        with file_path.open("r", encoding="utf-8") as file:
+            parameter_data: dict[str, str] = json.load(file)
+
         parameter_set_func_dict = asdict(parameter_set_func_dataclass)
 
         for key, value in parameter_data.items():
