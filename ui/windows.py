@@ -30,6 +30,7 @@ from utils.qt_tools import (
     SetConnect,
     Message, 
     set_language, 
+    reset_ui
 )
 from utils.common_tools import set_dynamic_glossary_state
 
@@ -411,7 +412,9 @@ class MainWindow(QMainWindow):
         )
 
     def set_connect(self):
-        self.reset_ui_action.triggered.connect(Message.reset_ui_message)
+        self.reset_ui_action.triggered.connect(
+            lambda: Message.warning_message(language.reset_ui_message, reset_ui)
+        )
         self.language_group.triggered.connect(
             lambda ui_language: set_language(
                 self.widgets_set_language_func,

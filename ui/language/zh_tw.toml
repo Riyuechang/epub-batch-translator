@@ -85,3 +85,15 @@ message = """
 <br><br>開發者: <a href="https://github.com/Riyuechang">Riyuechang</a>
 <br><br>儲存庫: <a href="https://github.com/Riyuechang/epub-batch-translator">epub-batch-translator</a>"""
 confirm = "確認"
+
+[save_warning_message]
+title = "警告！"
+message = "這將會「覆蓋」已儲存的參數檔，並且無法復原！"
+confirm = "確認並「覆蓋」"
+cancel = "取消"
+
+[delete_warning_message]
+title = "警告！"
+message = "這將會「刪除」已儲存的參數檔，並且無法復原！"
+confirm = "確認並「刪除」"
+cancel = "取消"

@@ -24,7 +24,7 @@ from PyQt6.QtWidgets import (
 
 from config import config, FolderConfig, ParameterFileConfig
 from ui.image import icon
-from ui.content import language
+from ui.content import language, WarningMessage
 from utils.common_tools import remove_user_config, set_file_options, get_list_index
 
 
@@ -120,7 +120,10 @@ class ParameterFile:
         parameter_file = folder_path.joinpath(f"{file_name}.json")
 
         if parameter_file.is_file():
-            pass
+            result = Message.warning_message(language.save_warning_message, lambda: None)
+
+            if not result:
+                return
 
         with parameter_file.open('w', encoding='utf-8') as file:
             json.dump(asdict(dataclass_obj), file, indent=4, ensure_ascii=False)
@@ -135,6 +138,11 @@ class ParameterFile:
         file_name = combo_box.currentText()
 
         if file_name == "":
+            return
+
+        result = Message.warning_message(language.delete_warning_message, lambda: None)
+
+        if not result:
             return
 
         Path(set_config.folder_path, f"{file_name}.json").unlink()
@@ -354,15 +362,18 @@ class SetConnect:
 
 class Message:
     @staticmethod
-    def reset_ui_message():
+    def warning_message(
+        language: WarningMessage,
+        trigger_func: Callable[[], None]
+    ):
         message_box = QMessageBox()
 
         message_box.setIcon(QMessageBox.Icon.Warning)
-        message_box.setWindowTitle(language.reset_ui_message.title)
-        message_box.setText(language.reset_ui_message.message)
+        message_box.setWindowTitle(language.title)
+        message_box.setText(language.message)
 
-        action_button = message_box.addButton(language.reset_ui_message.confirm, QMessageBox.ButtonRole.ActionRole)
-        reject_button = message_box.addButton(language.reset_ui_message.cancel, QMessageBox.ButtonRole.RejectRole)
+        action_button = message_box.addButton(language.confirm, QMessageBox.ButtonRole.ActionRole)
+        reject_button = message_box.addButton(language.cancel, QMessageBox.ButtonRole.RejectRole)
 
         message_box.setDefaultButton(reject_button)
         message_box.exec()
@@ -370,9 +381,10 @@ class Message:
         clicked_button = message_box.clickedButton()
 
         if clicked_button == action_button:
-            QApplication.quit()
-            remove_user_config()
-            QProcess.startDetached(sys.executable, sys.argv)
+            trigger_func()
+            return True
+        
+        return False
 
     @staticmethod
     def about_message():
@@ -395,6 +407,11 @@ def set_language(
 
     for set_language_func in widgets_set_language_func:
         set_language_func()
+
+def reset_ui():
+    QApplication.quit()
+    remove_user_config()
+    QProcess.startDetached(sys.executable, sys.argv)
 
 def copy_to_clipboard(text: str):
     clipboard = QApplication.clipboard()

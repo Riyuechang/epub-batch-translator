@@ -85,3 +85,15 @@ Version: v0.0.alpha
 <br><br>Dev: <a href="https://github.com/Riyuechang">Riyuechang</a>
 <br><br>Repo: <a href="https://github.com/Riyuechang/epub-batch-translator">epub-batch-translator</a>"""
 confirm = "confirm"
+
+[save_warning_message]
+title = "Warning!"
+message = "This will \"Overwrite\" the saved parameter file and cannot be recovered!"
+confirm = "confirm and \"Overwrite\""
+cancel = "cancel"
+
+[delete_warning_message]
+title = "Warning!"
+message = "This will \"Delete\" the saved parameter file and cannot be recovered!"
+confirm = "confirm and \"Delete\""
+cancel = "cancel"

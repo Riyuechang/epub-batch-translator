@@ -84,7 +84,7 @@ class VllmTab:
     tab_name: str
 
 @dataclass_pre_init
-class ResetUiMessage:
+class WarningMessage:
     title: str
     message: str
     confirm: str
@@ -108,8 +108,10 @@ class Language:
     prompt_parameter: ParameterFile
     llm_api_tab: LlmApiTab
     vllm_tab: VllmTab
-    reset_ui_message: ResetUiMessage
+    reset_ui_message: WarningMessage
     about_message: AboutMessage
+    save_warning_message: WarningMessage
+    delete_warning_message: WarningMessage
 
     def __post_init__(self):
         self.load_language(config.ui.language)
