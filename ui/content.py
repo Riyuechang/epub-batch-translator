@@ -91,10 +91,19 @@ class WarningMessage:
     cancel: str
 
 @dataclass_pre_init
+class SystemMessage:
+    message: str
+
+@dataclass_pre_init
 class AboutMessage:
     title: str
     message: str
     confirm: str
+
+@dataclass_pre_init
+class SaveMessage:
+    warning: WarningMessage
+    system: SystemMessage
 
 @dataclass_pre_init
 class Language:
@@ -110,7 +119,7 @@ class Language:
     vllm_tab: VllmTab
     reset_ui_message: WarningMessage
     about_message: AboutMessage
-    save_warning_message: WarningMessage
+    save_message: SaveMessage
     delete_warning_message: WarningMessage
 
     def __post_init__(self):

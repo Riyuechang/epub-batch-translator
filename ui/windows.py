@@ -2,7 +2,7 @@ import os
 from collections.abc import Callable
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QCursor, QActionGroup, QAction
+from PyQt6.QtGui import QCursor, QActionGroup, QAction, QIcon
 from PyQt6.QtWidgets import (
     QMainWindow, 
     QApplication, 
@@ -38,7 +38,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("epub-batch-translator")
+        self.setWindowTitle(config.ui.window_title)
+        self.setWindowIcon(QIcon(icon.app))
         self.resize(config.ui.width, config.ui.height)
         self.center()
         self.set_ui()

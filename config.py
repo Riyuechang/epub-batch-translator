@@ -14,6 +14,7 @@ USER_CONFIG_PATH = USER_DATA_PATH.joinpath("config.json")
 
 @dataclass_pre_init
 class UiConfig:
+    window_title: str
     width: int
     height: int
     language: str

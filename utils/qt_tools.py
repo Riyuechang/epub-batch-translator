@@ -19,7 +19,8 @@ from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QLineEdit,
-    QSizePolicy
+    QSizePolicy,
+    QSystemTrayIcon
 )
 
 from config import config, FolderConfig, ParameterFileConfig
@@ -120,7 +121,7 @@ class ParameterFile:
         parameter_file = folder_path.joinpath(f"{file_name}.json")
 
         if parameter_file.is_file():
-            result = Message.warning_message(language.save_warning_message, lambda: None)
+            result = Message.warning_message(language.save_message.warning, lambda: None)
 
             if not result:
                 return
@@ -129,6 +130,15 @@ class ParameterFile:
             json.dump(asdict(dataclass_obj), file, indent=4, ensure_ascii=False)
 
         ParameterFile.load_combo_box(set_config, combo_box)
+        system_tray_icon = QSystemTrayIcon(QApplication.instance())
+        system_tray_icon.setIcon(QIcon(icon.app))
+        system_tray_icon.show()
+        system_tray_icon.showMessage(
+            config.ui.window_title,
+            language.save_message.system.message,
+            QSystemTrayIcon.MessageIcon.Warning,
+            1000
+        )
 
     @staticmethod
     def delete(
