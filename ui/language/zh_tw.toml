@@ -56,9 +56,8 @@ source_text = "原文標籤"
 translation = "譯文標籤"
 annotation = "註解標籤"
 
-[prompt_parameter]
-parameter_file = "提示詞設定檔"
-parameter_file_example = "檔案名"
+[parameter_file_label]
+text = "參數檔"
 
 [prompt_options]
 dynamic_glossary = "動態術語表"

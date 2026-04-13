@@ -1,0 +1,91 @@
+[model]
+tag = "--model"
+value = ""
+
+[tokenizer]
+tag = "--tokenizer"
+value = ""
+
+[dtype]
+tag = "--dtype"
+value = "bfloat16"
+
+[kv_cache_dtype]
+tag = "--kv-cache-dtype"
+value = ""
+
+[kv_offloading_size]
+tag = "--kv-offloading-size"
+value = 0
+
+[kv_offloading_backend]
+tag = "--kv-offloading-backend"
+value = ""
+
+[quantization]
+tag = "--quantization"
+value = ""
+
+[gpu_memory_utilization]
+tag = "--gpu-memory-utilization"
+value = 0.9
+
+[max_model_len]
+tag = "--max-model-len"
+value = 2048
+
+[max_num_batched_tokens]
+tag = "--max-num-batched-tokens"
+value = 8192
+
+[max_num_seqs]
+tag = "--max-num-seqs"
+value = 8
+
+[enable_chunked_prefill]
+tag = "--enable-chunked-prefill"
+value = true
+
+[enable_prefix_caching]
+tag = "--enable-prefix-caching"
+value = true
+
+[enforce_eager]
+tag = "--enforce-eager"
+value = true
+
+
+# 固定啟用的參數
+#[runner]
+#tag = "--runner"
+#value = ""
+#
+#[language_model_only]
+#tag = "--language-model-only"
+#value = true
+#
+#[async_scheduling]
+#tag = "--async-scheduling"
+#value = true
+
+
+# 較少使用的參數，提供額外參數欄位讓使用者根據需求增加參數
+#[trust_remote_code]
+#tag = "--trust-remote-code"
+#value = false
+#
+#[pipeline_parallel_size]
+#tag = "--pipeline-parallel-size"
+#value = 0
+#
+#[tensor_parallel_size]
+#tag = "--tensor-parallel-size"
+#value = 0
+#
+#[enable_expert_parallel]
+#tag = "--enable-expert-parallel"
+#value = false
+#
+#[seed]
+#tag = "--seed"
+#value = 0

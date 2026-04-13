@@ -52,7 +52,8 @@ class Config:
     ui: UiConfig
     epub: FolderConfig
     glossary: FolderConfig
-    prompt_parameter: ParameterFileConfig
+    vllm_parameter_file: ParameterFileConfig
+    prompt_parameter_file: ParameterFileConfig
     prompt_options: PromptOptions
     translation_tag: TranslationTag
     glossary_tag: GlossaryTag

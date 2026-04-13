@@ -71,9 +71,8 @@ class PromptOptions:
     dynamic_glossary: str
 
 @dataclass_pre_init
-class ParameterFile:
-    parameter_file: str
-    parameter_file_example: str
+class ParameterFileLabel:
+    text: str
 
 @dataclass_pre_init
 class LlmApiTab:
@@ -114,7 +113,7 @@ class Language:
     processing_stage: ProcessingStage
     prompts_area: PromptsArea
     prompt_options: PromptOptions
-    prompt_parameter: ParameterFile
+    parameter_file_label: ParameterFileLabel
     llm_api_tab: LlmApiTab
     vllm_tab: VllmTab
     reset_ui_message: WarningMessage

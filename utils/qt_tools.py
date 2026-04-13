@@ -1,7 +1,6 @@
 import sys
 import json
 from pathlib import Path
-from dataclasses import dataclass, asdict
 from collections.abc import Callable
 from typing import Literal
 
@@ -19,6 +18,7 @@ from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QLineEdit,
+    QPlainTextEdit,
     QSizePolicy,
     QSystemTrayIcon
 )
@@ -26,7 +26,9 @@ from PyQt6.QtWidgets import (
 from config import config, FolderConfig, ParameterFileConfig
 from ui.image import icon
 from ui.content import language, WarningMessage
+from utils.dataclass_tools import get_dict
 from utils.common_tools import remove_user_config, set_file_options, get_list_index
+from utils.qt_widgets_dataclass import SelectPathWidget, CopyLineEdit, ParamsFileWidget
 
 
 class Folder:
@@ -78,16 +80,6 @@ class Folder:
         Folder.read_files(set_config.folder_path, set_config, combo_box, pattern)
 
 class ParameterFile:
-    @dataclass
-    class PromptParameter:
-        translation_prompt: str
-        glossary_prompt: str
-
-    @dataclass
-    class PromptParameterSetFunc:
-        translation_prompt: Callable[[str | None], None]
-        glossary_prompt: Callable[[str | None], None]
-
     @staticmethod
     def load_combo_box(
         set_config: ParameterFileConfig, 
@@ -106,7 +98,7 @@ class ParameterFile:
     def save(
         set_config: ParameterFileConfig,
         combo_box: QComboBox,
-        dataclass_obj: object
+        params_widget_dataclass: object
     ):
         file_name = combo_box.currentText()
         
@@ -127,7 +119,7 @@ class ParameterFile:
                 return
 
         with parameter_file.open('w', encoding='utf-8') as file:
-            json.dump(asdict(dataclass_obj), file, indent=4, ensure_ascii=False)
+            json.dump(ParameterFile.get_widgets_value(params_widget_dataclass), file, indent=4, ensure_ascii=False)
 
         ParameterFile.load_combo_box(set_config, combo_box)
         system_tray_icon = QSystemTrayIcon(QApplication.instance())
@@ -159,10 +151,10 @@ class ParameterFile:
         ParameterFile.load_combo_box(set_config, combo_box)
 
     @staticmethod
-    def load_parameter(
+    def load_params(
         file_name: str, 
         set_config: ParameterFileConfig,
-        parameter_set_func_dataclass: object
+        params_widget_dataclass: object
     ):
         file_path = Path(set_config.folder_path, f"{file_name}.json")
 
@@ -174,37 +166,42 @@ class ParameterFile:
         with file_path.open("r", encoding="utf-8") as file:
             parameter_data: dict[str, str] = json.load(file)
 
-        parameter_set_func_dict = asdict(parameter_set_func_dataclass)
+        ParameterFile.set_widgets_value(params_widget_dataclass, parameter_data)
 
-        for key, value in parameter_data.items():
-            parameter_set_func_dict[key](value)
+    @staticmethod
+    def get_widgets_value(widgets: object):
+        widgets_dict = get_dict(widgets)
+
+        params = {}
+        for key, value in widgets_dict.items():
+            match value:
+                case QLineEdit():
+                    params[key] = value.text()
+
+                case QPlainTextEdit():
+                    params[key] = value.toPlainText()
+
+                case QCheckBox():
+                    params[key] = value.isChecked()
+
+        return params
+
+    @staticmethod
+    def set_widgets_value(widgets: object, data: dict):
+        widgets_dict = get_dict(widgets)
+
+        for key, value in widgets_dict.items():
+            match value:
+                case QLineEdit():
+                    value.setText(data[key])
+
+                case QPlainTextEdit():
+                    value.setPlainText(data[key])
+
+                case QCheckBox():
+                    value.setChecked(data[key])
 
 class SetWidget:
-    @dataclass
-    class SelectPathWidget:
-        layout: QHBoxLayout
-        file_combo_box: QComboBox
-        path_label: QLabel
-        path_line_edit: QLineEdit
-        refresh_button: QPushButton
-        open_folder_button: QPushButton
-        subfolder_check_box: QCheckBox
-
-    @dataclass
-    class CopyLineEdit:
-        line_edit: QLineEdit
-        action: QAction
-
-    @dataclass
-    class ParameterFileWidget:
-        layout: QHBoxLayout | QVBoxLayout
-        file_label: QLabel
-        file_combo_box: QComboBox
-        refresh_button: QPushButton
-        save_button: QPushButton
-        delete_button: QPushButton
-
-
     @staticmethod
     def select_path_widget(
         set_config: FolderConfig,
@@ -255,7 +252,7 @@ class SetWidget:
             lambda state: Folder.set_subfolder(state, set_config, file_combo_box, pattern)
         )
 
-        return SetWidget.SelectPathWidget(
+        return SelectPathWidget(
             layout=layout,
             file_combo_box=file_combo_box,
             path_label=path_label,
@@ -268,8 +265,7 @@ class SetWidget:
     @staticmethod
     def set_parameter_file_widget(
         set_config: ParameterFileConfig,
-        parameter_get_dataclass_func: Callable[[], object],
-        parameter_set_func_dataclass: object,
+        params_widget_dataclass: object,
         two_layers: bool = False
     ):
         layout = QHBoxLayout()
@@ -285,7 +281,7 @@ class SetWidget:
         file_combo_box.view().setTextElideMode(Qt.TextElideMode.ElideMiddle)
         file_combo_box.lineEdit().returnPressed.disconnect()
         file_combo_box.currentTextChanged.connect(
-            lambda text: ParameterFile.load_parameter(text, set_config, parameter_set_func_dataclass)
+            lambda text: ParameterFile.load_params(text, set_config, params_widget_dataclass)
         )
 
         if two_layers:
@@ -303,7 +299,7 @@ class SetWidget:
 
         save_button = SetWidget.push_button_icon(icon.save)
         save_button.clicked.connect(
-            lambda: ParameterFile.save(set_config, file_combo_box, parameter_get_dataclass_func())
+            lambda: ParameterFile.save(set_config, file_combo_box, params_widget_dataclass)
         )
         layout.addWidget(save_button)
 
@@ -313,7 +309,7 @@ class SetWidget:
         )
         layout.addWidget(delete_button)
 
-        return SetWidget.ParameterFileWidget(
+        return ParamsFileWidget(
             layout=second_layout if two_layers else layout,
             file_label=file_label,
             file_combo_box=file_combo_box,
@@ -347,7 +343,7 @@ class SetWidget:
         line_edit_width = line_edit.fontMetrics().horizontalAdvance(line_edit.text())
         line_edit.setFixedWidth(line_edit_width + 35)
 
-        return SetWidget.CopyLineEdit(
+        return CopyLineEdit(
             line_edit=line_edit, 
             action=action
         )

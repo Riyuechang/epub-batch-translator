@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import (
 from config import config
 from ui.image import icon
 from ui.content import language
+from ui.vllm_params_widget import set_vllm_params_widget
 from utils.qt_tools import (
     Folder,
     ParameterFile,
@@ -31,6 +32,7 @@ from utils.qt_tools import (
     set_language, 
     reset_ui
 )
+from utils.qt_widgets_dataclass import PromptParamsWidget
 from utils.common_tools import set_dynamic_glossary_state, set_tabs_index
 
 class MainWindow(QMainWindow):
@@ -70,7 +72,8 @@ class MainWindow(QMainWindow):
 
         Folder.read_files(config.epub.folder_path, config.epub, self.epub_folder_widget.file_combo_box, "epub")
         Folder.read_files(config.glossary.folder_path, config.glossary, self.glossary_folder_widget.file_combo_box, "json")
-        ParameterFile.load_combo_box(config.prompt_parameter, self.prompt_parameter_file_widget.file_combo_box)
+        ParameterFile.load_combo_box(config.prompt_parameter_file, self.prompt_parameter_file_widget.file_combo_box)
+        ParameterFile.load_combo_box(config.vllm_parameter_file, self.vllm_tab_widget.file_combo_box)
 
         set_language(self.widgets_set_language_func)
 
@@ -308,22 +311,15 @@ class MainWindow(QMainWindow):
 
     def set_prompt_options_layout(self):
         self.prompt_parameter_file_widget = SetWidget.set_parameter_file_widget(
-            config.prompt_parameter,
-            lambda: ParameterFile.PromptParameter(
-                translation_prompt=self.translation_prompt_text_edit.toPlainText(),
-                glossary_prompt=self.glossary_prompt_line_edit.text()
-            ),
-            ParameterFile.PromptParameterSetFunc(
-                translation_prompt=self.translation_prompt_text_edit.setPlainText,
-                glossary_prompt=self.glossary_prompt_line_edit.setText
+            config.prompt_parameter_file,
+            PromptParamsWidget(
+                translation_prompt=self.translation_prompt_text_edit,
+                glossary_prompt=self.glossary_prompt_line_edit
             )
         )
         self.prompt_layout.addLayout(self.prompt_parameter_file_widget.layout)
         self.widgets_set_language_func.append(
-            lambda: self.prompt_parameter_file_widget.file_label.setText(language.prompt_parameter.parameter_file)
-        )
-        self.widgets_set_language_func.append(
-            lambda: self.prompt_parameter_file_widget.file_combo_box.lineEdit().setPlaceholderText(language.prompt_parameter.parameter_file_example)
+            lambda: self.prompt_parameter_file_widget.file_label.setText(language.parameter_file_label.text)
         )
 
         self.prompt_parameter_file_widget.layout.addStretch(1)
@@ -346,6 +342,8 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.llm_api_tab, "none")
         self.tabs.addTab(self.vllm_tab, "none")
 
+        self.set_vllm_tab()
+
         self.tabs.setCurrentIndex(config.ui.tabs_index)
         self.tabs.currentChanged.connect(set_tabs_index)
 
@@ -355,6 +353,23 @@ class MainWindow(QMainWindow):
         self.widgets_set_language_func.append(
             lambda: self.tabs.setTabText(1, language.vllm_tab.tab_name)
         )
+
+    def set_vllm_tab(self):
+        self.vllm_params_widget = set_vllm_params_widget()
+
+        self.vllm_tab_widget = SetWidget.set_parameter_file_widget(
+            config.vllm_parameter_file,
+            self.vllm_params_widget,
+            two_layers=True
+        )
+        self.vllm_tab.setLayout(self.vllm_tab_widget.layout)
+        self.widgets_set_language_func.append(
+            lambda: self.vllm_tab_widget.file_label.setText(language.parameter_file_label.text)
+        )
+
+        self.vllm_tab_widget.layout.addSpacing(10)
+        self.vllm_tab_widget.layout.addWidget(self.vllm_params_widget.widget)
+        self.vllm_tab_widget.layout.addStretch(1)
 
     def set_processing_layout(self):
         self.processing_layout = QGridLayout()
