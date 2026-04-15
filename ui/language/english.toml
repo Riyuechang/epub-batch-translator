@@ -17,7 +17,11 @@ folder_path = "epub folder path"
 auto_glossary = "-- Auto Glossary --"
 folder_path = "glossary folder path"
 
-[processing_stage]
+[parameter_file_label]
+text = "parameter file"
+
+[processing_tab]
+tab_name = "control"
 select_translator = "translator"
 no_task = "There are no ongoing tasks."
 auto_processing = "auto"
@@ -28,7 +32,8 @@ translate = "translate"
 alignment_check = "alignment check"
 replace_translation = "replace translation"
 
-[prompts_area]
+[prompts_tab]
+tab_name = "prompts"
 translation_prompt = "translation prompt"
 translation_prompt_example = """
 You are an expert Chinese novel translator, skilled at translating Chinese into English in a corresponding style without compromising the original meaning or intent.
@@ -46,20 +51,17 @@ Please refer to the history during translation to ensure smooth coherence betwee
 glossary_prompt = "glossary prompt"
 glossary_prompt_example = "<Source Text>{source_text} <Translation>{translation} <Annotation>{annotation}"
 
-[prompts_area.translation_tag]
+[prompts_tab.translation_tag]
 content = "Content Tag"
 glossary = "Glossary Tag"
 history = "History Tag"
 
-[prompts_area.glossary_tag]
+[prompts_tab.glossary_tag]
 source_text = "Source Text Tag"
 translation = "Translation Tag"
 annotation = "Annotation Tag"
 
-[parameter_file_label]
-text = "parameter file"
-
-[prompt_options]
+[prompts_tab.options]
 dynamic_glossary = "dynamic glossary"
 
 [llm_api_tab]

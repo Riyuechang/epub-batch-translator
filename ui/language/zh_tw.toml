@@ -17,7 +17,11 @@ folder_path = "epub 資料夾路徑"
 auto_glossary = "-- 自動術語表 --"
 folder_path = "術語表資料夾路徑"
 
-[processing_stage]
+[parameter_file_label]
+text = "參數檔"
+
+[processing_tab]
+tab_name = "控制"
 select_translator = "翻譯器"
 no_task = "沒有正在進行的任務"
 auto_processing = "自動處理"
@@ -28,7 +32,8 @@ translate = "翻譯"
 alignment_check = "對齊檢查"
 replace_translation = "替換翻譯"
 
-[prompts_area]
+[prompts_tab]
+tab_name = "提示詞"
 translation_prompt = "翻譯提示詞"
 translation_prompt_example = """
 你是一個英文小說翻譯專家，擅長在不破壞原文想傳達的事物下，將英文以對應的風格翻譯成繁體中文。
@@ -46,20 +51,17 @@ translation_prompt_example = """
 glossary_prompt = "術語表提示詞"
 glossary_prompt_example = "<原文>{source_text} <譯文>{translation} <註解>{annotation}"
 
-[prompts_area.translation_tag]
+[prompts_tab.translation_tag]
 content = "內容標籤"
 glossary = "術語表標籤"
 history = "歷史標籤"
 
-[prompts_area.glossary_tag]
+[prompts_tab.glossary_tag]
 source_text = "原文標籤"
 translation = "譯文標籤"
 annotation = "註解標籤"
 
-[parameter_file_label]
-text = "參數檔"
-
-[prompt_options]
+[prompts_tab.options]
 dynamic_glossary = "動態術語表"
 
 [llm_api_tab]

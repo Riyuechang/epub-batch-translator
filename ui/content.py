@@ -34,7 +34,8 @@ class GlossaryWidget:
     folder_path: str
 
 @dataclass_pre_init
-class ProcessingStage:
+class ProcessingTab:
+    tab_name: str
     select_translator: str
     no_task: str
     auto_processing: str
@@ -58,17 +59,19 @@ class GlossaryTag:
     annotation: str
 
 @dataclass_pre_init
-class PromptsArea:
+class PromptsOptions:
+    dynamic_glossary: str
+
+@dataclass_pre_init
+class PromptsTab:
+    tab_name: str
     translation_prompt: str
     translation_prompt_example: str
     translation_tag: TranslationTag
     glossary_prompt: str
     glossary_prompt_example: str
     glossary_tag: GlossaryTag
-
-@dataclass_pre_init
-class PromptOptions:
-    dynamic_glossary: str
+    options: PromptsOptions
 
 @dataclass_pre_init
 class ParameterFileLabel:
@@ -110,10 +113,9 @@ class Language:
     folder_options: FolderOptions
     epub_widget: EpubWidget
     glossary_widget: GlossaryWidget
-    processing_stage: ProcessingStage
-    prompts_area: PromptsArea
-    prompt_options: PromptOptions
     parameter_file_label: ParameterFileLabel
+    processing_tab: ProcessingTab
+    prompts_tab: PromptsTab
     llm_api_tab: LlmApiTab
     vllm_tab: VllmTab
     reset_ui_message: WarningMessage
