@@ -265,16 +265,12 @@ class SetWidget:
     @staticmethod
     def set_parameter_file_widget(
         set_config: ParameterFileConfig,
-        params_widget_dataclass: object,
-        two_layers: bool = False
+        params_widget_dataclass: object
     ):
         layout = QHBoxLayout()
 
         file_label = QLabel()
         layout.addWidget(file_label)
-
-        if two_layers:
-            layout.addStretch(1)
 
         file_combo_box = QComboBox()
         file_combo_box.setEditable(True)
@@ -284,12 +280,7 @@ class SetWidget:
             lambda text: ParameterFile.load_params(text, set_config, params_widget_dataclass)
         )
 
-        if two_layers:
-            second_layout = QVBoxLayout()
-            second_layout.addLayout(layout)
-            second_layout.addWidget(file_combo_box)
-        else:
-            layout.addWidget(file_combo_box, 1)
+        layout.addWidget(file_combo_box, 1)
 
         refresh_button = SetWidget.push_button_icon(icon.refresh)
         refresh_button.clicked.connect(
@@ -310,7 +301,7 @@ class SetWidget:
         layout.addWidget(delete_button)
 
         return ParamsFileWidget(
-            layout=second_layout if two_layers else layout,
+            layout=layout,
             file_label=file_label,
             file_combo_box=file_combo_box,
             refresh_button=refresh_button,
